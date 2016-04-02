@@ -66,7 +66,7 @@ protected:
 
     bool first,dead;
     int deadCount;
-    sf::Uint8 frame,anchor;
+    sf::Uint8 frame,anchor,classNum;
 
 public:
 

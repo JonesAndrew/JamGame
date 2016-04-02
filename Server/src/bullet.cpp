@@ -16,4 +16,5 @@ Bullet::Bullet(VECTOR2 p, float a) {
 	Disk *d = new Disk();
     d->radius = radius;
     shape = d;
+    classNum = 1;
 }

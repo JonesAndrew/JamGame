@@ -23,6 +23,7 @@ Player::Player() : Actor() {
     maxVel = 4.5;
     deccel = 0.3;
     shotTime = 0;
+    classNum = 2;
 }
 
 float Player::getAccel() {

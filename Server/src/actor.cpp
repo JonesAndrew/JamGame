@@ -102,6 +102,7 @@ bool Disk::intersectWith(Circle* c) {
 bool Disk::intersectWith(Polygon *p) {return p->intersectWith(this);}
 
 Actor::Actor() {
+    classNum = 0;
     first = true;
     anchor = 0;
     radius = 10;
@@ -172,7 +173,7 @@ sf::Uint8 Actor::getFrame() {
 void Actor::send(sf::Packet& p) {
     p << num << getPos().x << getPos().y << angle << getFrame() << first;
     if (first) {
-        p << anchor << radius;
+        p << classNum << anchor << radius;
         first = false;
     }
 }
