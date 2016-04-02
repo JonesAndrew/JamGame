@@ -47,6 +47,9 @@ void Game::update() {
 
     restartTime--;
     if (restartTime == 0) {
+        if (actors.size() > 6) {
+            actors.erase(actors.begin()+6,actors.end());
+        }
         actors.clear();
         actors.insert(actors.begin(),gamePlayers.begin(),gamePlayers.end());
         for (int i=0; i<2; i++) {
