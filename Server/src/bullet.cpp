@@ -13,7 +13,7 @@ void Bullet::collidedBy(std::shared_ptr<Actor> a) {
     a->collideWith(std::static_pointer_cast<Bullet>(shared_from_this()));
 }
 
-Bullet::Bullet(VECTOR2 p, float a) {
+Bullet::Bullet(VECTOR2 p, float a) : Actor() {
 	pos = p;
 	velocity = VECTOR2(4,0)%a;
 	radius = 4;

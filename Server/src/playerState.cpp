@@ -16,20 +16,42 @@ PlayerState* PlayerState::update(Player& player) {
 
 
 void WalkState::enter(Player& player) {
-
+	stopped = true;
 }
 
 PlayerState* WalkState::update(Player& player) {
 	VECTOR2 vel = player.getVelocity();
 	player.setPos(player.getPos()+vel);
 	float mag = vel.mag();
+	player.frameTime++;
+	if (player.frameTime > 6) {
+		player.frameTime = 0;
+		player.frame++;
+	}
 	if (mag != 0) {
+		if (stopped == true) {
+			player.frameTime = 0;
+			player.frame = 0;
+		}
+		if (player.frame > 7) {
+			player.frame = 4;
+		}
+		stopped = false;
 		mag-=player.getDeccel();
 		if (mag < 0) {
 			mag = 0;
 		}
 		vel.trunc(mag);
 		player.setVelocity(vel);
+	} else {
+		if (stopped == false) {
+			player.frameTime = 0;
+			player.frame = 4;
+		}
+		if (player.frame > 3) {
+			player.frame = 0;
+		}
+		stopped = true;
 	}
 	player.shotTime--;
 	return nullptr;

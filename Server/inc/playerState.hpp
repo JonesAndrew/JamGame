@@ -17,6 +17,7 @@ protected:
 
 class WalkState : public PlayerState
 {
+	bool stopped;
 public:
 	virtual void enter(Player& player);
 	virtual ~WalkState() {}

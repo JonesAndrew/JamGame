@@ -111,6 +111,7 @@ Actor::Actor() {
     frame = 0;
     time = 0;
     pos = VECTOR2(0,0);
+    frameTime = 0;
 }
 
 void Actor::setPos(VECTOR2 p) {

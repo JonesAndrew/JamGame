@@ -66,11 +66,13 @@ protected:
 
     bool first,dead;
     int deadCount;
-    sf::Uint8 frame,anchor,classNum;
+    sf::Uint8 anchor,classNum;
 
 public:
 
     int time;
+    int frameTime;
+    sf::Uint8 frame;
 
     Game *game;
 
