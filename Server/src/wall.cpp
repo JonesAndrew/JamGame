@@ -14,6 +14,7 @@ Wall::Wall(VECTOR2 a, VECTOR2 b) {
     p->points.emplace_back(-size.x/2,-size.y/2);
     p->points.emplace_back(size.x/2,-size.y/2);
     shape = p;
+    classNum = 3;
 }
 
 void Wall::collideWith(std::shared_ptr<Actor> a) {

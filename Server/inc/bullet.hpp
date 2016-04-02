@@ -8,4 +8,5 @@ public:
     virtual void collidedBy(std::shared_ptr<Actor>);
 
     Bullet(VECTOR2,float);
+    virtual void update();
 };

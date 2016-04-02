@@ -135,6 +135,7 @@ bool Actor::isDead() {
 
 void Actor::setDead(bool d) {
     dead = d;
+    deadCount = 0;
 } 
 
 int Actor::getDeadCount() {
@@ -173,7 +174,7 @@ sf::Uint8 Actor::getFrame() {
 void Actor::send(sf::Packet& p) {
     p << num << getPos().x << getPos().y << angle << getFrame() << first;
     if (first) {
-        p << classNum << anchor << radius;
+        p << classNum;
         first = false;
     }
 }

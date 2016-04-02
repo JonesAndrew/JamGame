@@ -20,6 +20,7 @@ void Game::start() {
 
     for (int i=0; i<2; i++) {
         gamePlayers.push_back(std::make_shared<Player>());
+        gamePlayers.back()->setPos(VECTOR2(100+300*i,100+300*i));
         makeActor(gamePlayers.back());
     }
 
@@ -43,9 +44,6 @@ void Game::update() {
 
     for (int i=actors.size()-1;i>=0;i--) {
         actors[i]->update();
-        if (actors[i]->isDead() && actors[i]->getDeadCount() == 0) {
-            actors.erase(actors.begin()+i);
-        }
     }
 
     for (size_t i=0;i<actors.size();i++) {
@@ -54,6 +52,12 @@ void Game::update() {
             if (!actors[i]->isDead() && !actors[t]->isDead() && actors[i]->getShape()->intersectWith(actors[t]->getShape())) {
                 actors[i]->collideWith(actors[t]);
             }
+        }
+    }
+
+    for (int i=actors.size()-1;i>=0;i--) {
+        if (actors[i]->isDead() && actors[i]->getDeadCount() == 0) {
+            actors.erase(actors.begin()+i);
         }
     }
 

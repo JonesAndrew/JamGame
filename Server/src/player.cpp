@@ -82,5 +82,6 @@ void Player::collidedBy(std::shared_ptr<Actor> a) {
 void Player::collideWith(std::shared_ptr<Bullet> b) {
     if (b->time > 12) {
         dead = true;
+        b->setDead(true);
     }
 } 

@@ -46,7 +46,7 @@ PlayerState* WalkState::handleInput(Player& player, Input input) {
 	if (player.shotTime <= 0) {
 		if (input.s) {
 			player.game->makeActor(std::make_shared<Bullet>(player.getPos(),input.angle));
-			player.shotTime = 10;
+			player.shotTime = 15;
 		}
 	}
 
