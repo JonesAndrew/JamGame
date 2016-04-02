@@ -195,17 +195,17 @@ clean:
 # Main rule, checks the executable and symlinks to the output
 all: $(BIN_PATH)/$(BIN_NAME)
 	@echo "Making symlink: $(BIN_NAME) -> $<"
+ifeq ($(UNAME_S),Linux)
+	@$(RM) $(BIN_NAME)
+	@ln -s $(BIN_PATH)/$(BIN_NAME) $(BIN_NAME)
+else
 ifeq ($(UNAME_S),Darwin)
 	@$(RM) $(BIN_NAME)
 	@ln -s $(BIN_PATH)/$(BIN_NAME) $(BIN_NAME)
 else
-	ifeq ($(UNAME_S),Linux)
-		@$(RM) $(BIN_NAME)
-		@ln -s $(BIN_PATH)/$(BIN_NAME) $(BIN_NAME)
-	else
-		@$(RM) $(BIN_NAME).exe
-		@ln -s $(BIN_PATH)/$(BIN_NAME).exe $(BIN_NAME).exe
-	endif
+	@$(RM) $(BIN_NAME).exe
+	@ln -s $(BIN_PATH)/$(BIN_NAME).exe $(BIN_NAME).exe
+endif
 endif
 
 # Link the executable
