@@ -214,7 +214,7 @@ void Game::input(sf::RenderWindow *window) {
             packet<<sf::Uint8(0);
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Joystick::isButtonPressed(i, 3) || sf::Joystick::isButtonPressed(i, 0)) {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left) || sf::Joystick::isButtonPressed(i, 3) || sf::Joystick::isButtonPressed(i, 0)) {
             packet<<true;
         } else {
             packet<<false;
