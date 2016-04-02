@@ -36,7 +36,7 @@ struct Actor {
 
 struct Player : public Actor {
     Player();
-    sf::Sprite sprite;
+    sf::Sprite sprite,face;
     virtual void draw(sf::RenderTarget &window);
 };
 

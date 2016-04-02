@@ -36,8 +36,12 @@ void Bullet::draw(sf::RenderTarget &window) {
 
 Player::Player() {
     sprite = TextureLoader::getInstance()->getSprite("slimes.png");
+    face = TextureLoader::getInstance()->getSprite("face.png");
+
     sprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
+
     sprite.setOrigin(16,16);
+    face.setOrigin(16,16);
 }
 
 void Actor::inter(sf::Uint32 t1,sf::Uint32 t2) {
