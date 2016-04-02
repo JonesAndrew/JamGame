@@ -26,10 +26,10 @@ void Game::setupScene(sf::RenderWindow &window) {
     {
         // error...
     }
-    if (PLAYERS == 1) {
+    if (PLAYERS == 2) {
         server = "127.0.0.1";
     } else {
-        server = "104.131.40.249";
+        server = "104.236.122.65";
     }
     socket.connect(server,40000);
     std::cout<<"CONNECTED\n";
@@ -108,12 +108,7 @@ bool Game::tick(sf::RenderWindow *window) {
     sf::IpAddress sender;
     unsigned short p;
     while (gameSocket->receive(packet,sender,p) == sf::Socket::Done) {
-        sf::Uint16 tick;
-        packet>>tick;
-        if (tick == 1) {
-            start();
-            return true;
-        }
+        packet>>player;
         sf::Uint32 last = tickTarget;
         packet>>tickTarget;
         if (tickTarget > last) {
@@ -228,7 +223,7 @@ void Game::input(sf::RenderWindow *window) {
         if (actors.size() > 0) {
             sf::Vector2i tm = sf::Mouse::getPosition(*window);
             sf::Vector2f p = sf::Vector2f(tm.x,tm.y);
-            sf::Vector2f pos = actors[4]->sprite.getPosition();
+            sf::Vector2f pos = actors[4+player]->sprite.getPosition();
             p-=pos;
 
             packet<<float(std::atan2(p.y, p.x));

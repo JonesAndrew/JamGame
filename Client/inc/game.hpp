@@ -22,6 +22,7 @@ class Game : public Scene {
     bool wait;
     sf::Uint32 tickCurrent;
     sf::Uint32 tickTarget;
+    sf::Uint16 player;
     sf::View view;
 public:
     void start();
