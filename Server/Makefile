@@ -199,8 +199,13 @@ ifeq ($(UNAME_S),Darwin)
 	@$(RM) $(BIN_NAME)
 	@ln -s $(BIN_PATH)/$(BIN_NAME) $(BIN_NAME)
 else
-	@$(RM) $(BIN_NAME).exe
-	@ln -s $(BIN_PATH)/$(BIN_NAME).exe $(BIN_NAME).exe
+	ifeq ($(UNAME_S),Linux)
+		@$(RM) $(BIN_NAME)
+		@ln -s $(BIN_PATH)/$(BIN_NAME) $(BIN_NAME)
+	else
+		@$(RM) $(BIN_NAME).exe
+		@ln -s $(BIN_PATH)/$(BIN_NAME).exe $(BIN_NAME).exe
+	endif
 endif
 
 # Link the executable
