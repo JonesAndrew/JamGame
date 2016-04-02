@@ -18,7 +18,7 @@ void Game::start() {
     makeActor(std::make_shared<Wall>(VECTOR2(0,250),VECTOR2(10,500)));
     makeActor(std::make_shared<Wall>(VECTOR2(500,250),VECTOR2(10,500)));
 
-    for (int i=0; i<1; i++) {
+    for (int i=0; i<2; i++) {
         gamePlayers.push_back(std::make_shared<Player>());
         makeActor(gamePlayers.back());
     }

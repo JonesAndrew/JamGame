@@ -233,7 +233,7 @@ void tcpLoop() {
 
                         que.push_back(players[i]);
 
-                        if (que.size() == 1) {
+                        if (que.size() == 2) {
                             startGame(que);
                             que.clear();
                         }
