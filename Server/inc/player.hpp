@@ -32,4 +32,6 @@ public:
     virtual void collidedBy(std::shared_ptr<Actor>);
     
     virtual void collideWith(std::shared_ptr<Bullet>);
+
+    void res();
 };

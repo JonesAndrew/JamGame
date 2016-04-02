@@ -26,6 +26,12 @@ Player::Player() : Actor() {
     classNum = 2;
 }
 
+void Player::res() {
+    shotTime = 0;
+    velocity = VECTOR2(0,0);
+    dead = false;
+}
+
 float Player::getAccel() {
     return accel;
 }

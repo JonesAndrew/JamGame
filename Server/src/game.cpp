@@ -12,6 +12,7 @@ void Game::start() {
     h=720*2;
     tick=0;
     actorCount=0;
+    restartTime = 0;
 
     makeActor(std::make_shared<Wall>(VECTOR2(256,12),VECTOR2(512,20)));
     makeActor(std::make_shared<Wall>(VECTOR2(256,490),VECTOR2(512,20)));
@@ -37,8 +38,20 @@ void Game::update() {
 
                 gamePlayers[count]->handleInput(p->input[t]);
 
+            } else if (restartTime < 0) {
+                restartTime = 60;
             }
             count++;
+        }
+    }
+
+    restartTime--;
+    if (restartTime == 0) {
+        actors.clear();
+        actors.insert(actors.begin(),gamePlayers.begin(),gamePlayers.end());
+        for (int i=0; i<2; i++) {
+            gamePlayers[i]->res();
+            gamePlayers[i]->setPos(VECTOR2(100+300*i,100+300*i));
         }
     }
 

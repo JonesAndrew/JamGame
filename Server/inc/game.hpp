@@ -12,6 +12,7 @@ class Game {
 protected:
     int gameNum;
     int w,h;
+    int restartTime;
     sf::Uint32 tick;
     sf::Uint16 actorCount;
     std::vector<sf::Vector2i> dir;
