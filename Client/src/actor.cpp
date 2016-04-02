@@ -1,24 +1,10 @@
 #include "actor.hpp"
 
-Actor::Actor(float r) {
-    radius = r;
-    shape.setRadius(r);
-    shape.setFillColor(sf::Color(rand()%100+155,rand()%100+155,rand()%100+155));
-    sprite = TextureLoader::getInstance()->getSprite("DGJane.png");
-    sprite.setTextureRect(sf::IntRect(0,0,48,48));
-    sprite.setOrigin(24,45);
-    rec.setFillColor(sf::Color(rand()%100+155,rand()%100+155,rand()%100+155));
-    rec.setOrigin(r,1);
-    rec.setSize(sf::Vector2f(r*2,2));
+Actor::Actor() {
 }
 
-void Actor::setAnchor(sf::Uint8 a) {
-    anchor = a;
-    if (anchor == 0) {
-        shape.setOrigin(radius,radius);
-    } else {
-        shape.setOrigin(radius,radius*2);
-    }
+void Actor::setClassNum(sf::Uint8 c) {
+    classNum = c;
 }
 
 bool Actor::prep(sf::Uint32 t,float alpha) {
@@ -28,34 +14,30 @@ bool Actor::prep(sf::Uint32 t,float alpha) {
     float x = state[t].pos.x * alpha + state[t-1].pos.x * (1.0 - alpha);
     float y = state[t].pos.y * alpha + state[t-1].pos.y * (1.0 - alpha);
 
-    shape.setPosition(x,y);
-    shape.setRotation(state[t].angle+90);
-    sprite.setPosition(x,y);
-    sprite.setRotation(state[t].angle+90);
-    rec.setPosition(x,y);
-    rec.setRotation(state[t].angle);
-    frame = state[t].frame;
-    if (frame > 0) {
-        if (frame > 128) {
-            frame-=128;
-            sprite.setScale(-1,1);
-        } else {
-            sprite.setScale(1,1);
-        }
-        int f=frame-1;
-        sprite.setTextureRect(sf::IntRect((f%10)*48,(f/10)*48,48,48));
-    }
+    pos = sf::Vector2f(x,y);
+    angle = state[t].angle;
     return false;
 }
 
 void Actor::draw(sf::RenderTarget &window) {
-    if (frame == 100) {
-        window.draw(rec);
-    } if (frame != 0) {
-        window.draw(sprite);
-    } else {
-        window.draw(shape);
-    }
+}
+
+Bullet::Bullet() {
+    sprite = TextureLoader::getInstance()->getSprite("guns.png");
+    sprite.setTextureRect(sf::IntRect(64, 0, 32, 32));
+    sprite.setOrigin(16,16);
+}
+
+void Bullet::draw(sf::RenderTarget &window) {
+    sprite.setPosition(pos);
+    sprite.setRotation(angle-90);
+    window.draw(sprite);
+}
+
+Player::Player() {
+    sprite = TextureLoader::getInstance()->getSprite("slimes.png");
+    sprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
+    sprite.setOrigin(16,16);
 }
 
 void Actor::inter(sf::Uint32 t1,sf::Uint32 t2) {
@@ -69,4 +51,9 @@ void Actor::inter(sf::Uint32 t1,sf::Uint32 t2) {
             state[t1+i].frame = state[t2].frame;
         }
     }
+}
+
+void Player::draw(sf::RenderTarget &window) {
+    sprite.setPosition(pos);
+    window.draw(sprite);
 }

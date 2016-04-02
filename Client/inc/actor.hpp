@@ -15,25 +15,35 @@ struct ActorState {
 };
 
 struct Actor {
-    sf::CircleShape shape;
-    sf::RectangleShape rec;
-    sf::Sprite sprite;
-    float radius;
     int frame;
+    float angle;
+    sf::Vector2f pos;
 
-    Actor(float r);
+    Actor();
 
-    void setAnchor(sf::Uint8 a);
+    void setClassNum(sf::Uint8);
 
     bool prep(sf::Uint32 t,float alpha);
 
-    void draw(sf::RenderTarget &window);
+    virtual void draw(sf::RenderTarget &window);
 
     void inter(sf::Uint32 t1,sf::Uint32 t2);
 
-    sf::Uint8 anchor;
+    sf::Uint8 classNum;
     std::map<sf::Uint32,ActorState> state;
     ActorState activeState;
+};
+
+struct Player : public Actor {
+    Player();
+    sf::Sprite sprite;
+    virtual void draw(sf::RenderTarget &window);
+};
+
+struct Bullet : public Actor {
+    Bullet();
+    sf::Sprite sprite;
+    virtual void draw(sf::RenderTarget &window);
 };
 
 #endif

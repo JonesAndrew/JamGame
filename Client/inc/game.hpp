@@ -24,6 +24,7 @@ class Game : public Scene {
     sf::Uint32 tickTarget;
     sf::Uint16 player;
     sf::View view;
+    sf::Sprite tileSheet;
 public:
     void start();
     void input(sf::RenderWindow *window);

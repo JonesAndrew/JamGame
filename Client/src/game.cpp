@@ -54,6 +54,8 @@ void Game::setupScene(sf::RenderWindow &window) {
     gameSocket->setBlocking(false);
     start();
     view = window.getView();
+    tileSheet = TextureLoader::getInstance()->getSprite("tiles.png");
+    tileSheet.setTextureRect(sf::IntRect(0, 64, 32, 32));
 }
 
 void Game::start() {
@@ -65,6 +67,32 @@ void Game::start() {
 }
 
 void Game::draw(sf::RenderTarget *window,float alpha) {
+    for (int x=0;x<16;x++) {
+        for (int y=0;y<16;y++) {
+            if (x==0 && y==0) {
+                tileSheet.setTextureRect(sf::IntRect(0, 0, 32, 32));
+            } else if (x==15 && y==0) {
+                tileSheet.setTextureRect(sf::IntRect(32, 0, 32, 32));
+            } else if (x==0 && y==15) {
+                tileSheet.setTextureRect(sf::IntRect(64, 0, 32, 32));
+            } else if (x==15 && y==15) {
+                tileSheet.setTextureRect(sf::IntRect(96, 0, 32, 32));
+            } else if (x==0) {
+                tileSheet.setTextureRect(sf::IntRect(96, 32, 32, 32));
+            } else if (x==15) {
+                tileSheet.setTextureRect(sf::IntRect(64, 32, 32, 32));
+            } else if (y==0) {
+                tileSheet.setTextureRect(sf::IntRect(0, 32, 32, 32));
+            } else if (y==15) {
+                tileSheet.setTextureRect(sf::IntRect(32, 32, 32, 32));
+            } else {
+                tileSheet.setTextureRect(sf::IntRect(0, 64, 32, 32));
+            }
+            tileSheet.setPosition(x*32,y*32);
+            window->draw(tileSheet);
+        }
+    }
+
     if (wait) {
         alpha = 1;
     }
@@ -79,9 +107,9 @@ void Game::draw(sf::RenderTarget *window,float alpha) {
         else
         {
             if (it->first == 0) {
-                float chase=0.06;
-                sf::Vector2f v = view.getCenter();
-                sf::Vector2f p = it->second->sprite.getPosition();
+                // float chase=0.06;
+                // sf::Vector2f v = view.getCenter();
+                // sf::Vector2f p = it->second->sprite.getPosition();
                 //view.setCenter(v.x+(p.x-v.x)*chase,v.y+(p.y-v.y)*chase);
                 window->setView(view);
             }
@@ -125,13 +153,18 @@ bool Game::tick(sf::RenderWindow *window) {
                 bool first;
                 if (packet>>num>>x>>y>>angle>>frame>>first) {
                     if (first) {
-                        sf::Uint8 a;
-                        float r;
-                        packet>>a>>r;
-                        actors[num] = std::make_shared<Actor>(r);
-                        actors[num]->setAnchor(a);
+                        sf::Uint8 cNum;
+                        packet>>cNum;
+                        if (cNum == 1) {
+                            actors[num] = std::make_shared<Bullet>();
+                        } else if (cNum == 2) {
+                            actors[num] = std::make_shared<Player>();
+                        } else {
+                            actors[num] = std::make_shared<Actor>();
+                        }
+                        actors[num]->setClassNum(cNum);
                     } else if (actors.find(num) == actors.end()) {
-                        actors[num] = std::make_shared<Actor>(10);
+                        actors[num] = std::make_shared<Actor>();
                     }
                     actors[num]->state[tickTarget].pos = sf::Vector2f(x,y);
                     actors[num]->state[tickTarget].angle = angle;
@@ -223,7 +256,7 @@ void Game::input(sf::RenderWindow *window) {
         if (actors.size() > 0) {
             sf::Vector2i tm = sf::Mouse::getPosition(*window);
             sf::Vector2f p = sf::Vector2f(tm.x,tm.y);
-            sf::Vector2f pos = actors[4+player]->sprite.getPosition();
+            sf::Vector2f pos = actors[4+player]->pos;
             p-=pos;
 
             packet<<float(std::atan2(p.y, p.x));
