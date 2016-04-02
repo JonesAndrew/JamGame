@@ -61,7 +61,7 @@ void Game::update() {
         sf::Packet packet;
         sf::Uint16 t=0;
 
-        packet<<t<<tick;
+        packet<<tick;
         for (auto &a : actors) {
             a->send(packet);
         }
@@ -80,8 +80,13 @@ void Game::handleInput(sf::Packet packet,std::shared_ptr<PlayerNetwork> p) {
 }
 
 void Game::send(sf::Packet packet) {
+    sf::Uint16 i=0;
     for (auto &p : players) {
-        socket->send(packet,p->address,p->port);
+        sf::Packet pac;
+        pac<<i;
+        i++;
+        pac.append(packet.getData(),packet.getDataSize());
+        socket->send(pac,p->address,p->port);
     }
 }
 
