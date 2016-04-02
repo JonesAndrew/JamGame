@@ -13,10 +13,10 @@ void Game::start() {
     tick=0;
     actorCount=0;
 
-    makeActor(std::make_shared<Wall>(VECTOR2(250,0),VECTOR2(500,10)));
-    makeActor(std::make_shared<Wall>(VECTOR2(250,500),VECTOR2(500,10)));
-    makeActor(std::make_shared<Wall>(VECTOR2(0,250),VECTOR2(10,500)));
-    makeActor(std::make_shared<Wall>(VECTOR2(500,250),VECTOR2(10,500)));
+    makeActor(std::make_shared<Wall>(VECTOR2(256,27),VECTOR2(512,20)));
+    makeActor(std::make_shared<Wall>(VECTOR2(256,517),VECTOR2(512,20)));
+    makeActor(std::make_shared<Wall>(VECTOR2(27,256),VECTOR2(20,512)));
+    makeActor(std::make_shared<Wall>(VECTOR2(517,256),VECTOR2(20,512)));
 
     for (int i=0; i<2; i++) {
         gamePlayers.push_back(std::make_shared<Player>());
