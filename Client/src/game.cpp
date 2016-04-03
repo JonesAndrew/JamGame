@@ -9,13 +9,18 @@
 #include "director.hpp"
 #include "game.hpp"
 #include "textureLoader.hpp"
+#include "sound.hpp"
 #include <cmath>
 #ifdef _WIN32
 #else
 // #include "ResourcePath.hpp"
 #endif
 
-#define PLAYERS 1
+#define PLAYERS 2
+
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
 
 sf::IpAddress server = "127.0.0.1";
 unsigned short port = 50000;
@@ -52,10 +57,30 @@ void Game::setupScene(sf::RenderWindow &window) {
     p<<sf::Uint8(PLAYERS)<<sf::Uint8(1);
     socket.send(p);
     gameSocket->setBlocking(false);
+
     start();
     view = window.getView();
+    view.zoom(0.5);
+    view.setCenter(7.5*32,4.5*32);
+    view2 = view;
     tileSheet = TextureLoader::getInstance()->getSprite("tiles.png");
     tileSheet.setTextureRect(sf::IntRect(0, 64, 32, 32));
+
+    SoundPlayer::getInstance()->loadSound("hit.wav");
+    SoundPlayer::getInstance()->loadSound("shoot.wav");
+    SoundPlayer::getInstance()->loadSound("death.wav");
+    SoundPlayer::getInstance()->loadSound("shield.wav");
+
+    sfxToName[0] = "hit.wav";
+    sfxToVol[0]  = 25;
+    sfxToName[1] = "shoot.wav";
+    sfxToVol[1]  = 60;
+    sfxToName[2] = "death.wav";
+    sfxToVol[2]  = 100;
+    sfxToName[3] = "shield.wav";
+    sfxToVol[3]  = 60;
+
+    shake = 0;
 }
 
 void Game::start() {
@@ -67,24 +92,31 @@ void Game::start() {
 }
 
 void Game::draw(sf::RenderTarget *window,float alpha) {
-    for (int x=0;x<16;x++) {
-        for (int y=0;y<16;y++) {
+    if (shake <= 0) {
+        window->setView(view);
+    } else {
+        window->setView(view2);
+    }
+    for (int x=0;x<15;x++) {
+        for (int y=0;y<9;y++) {
             if (x==0 && y==0) {
                 tileSheet.setTextureRect(sf::IntRect(0, 0, 32, 32));
-            } else if (x==15 && y==0) {
+            } else if (x==14 && y==0) {
                 tileSheet.setTextureRect(sf::IntRect(32, 0, 32, 32));
-            } else if (x==0 && y==15) {
+            } else if (x==0 && y==8) {
                 tileSheet.setTextureRect(sf::IntRect(64, 0, 32, 32));
-            } else if (x==15 && y==15) {
+            } else if (x==14 && y==8) {
                 tileSheet.setTextureRect(sf::IntRect(96, 0, 32, 32));
             } else if (x==0) {
                 tileSheet.setTextureRect(sf::IntRect(96, 32, 32, 32));
-            } else if (x==15) {
+            } else if (x==14) {
                 tileSheet.setTextureRect(sf::IntRect(64, 32, 32, 32));
             } else if (y==0) {
                 tileSheet.setTextureRect(sf::IntRect(0, 32, 32, 32));
-            } else if (y==15) {
+            } else if (y==8) {
                 tileSheet.setTextureRect(sf::IntRect(32, 32, 32, 32));
+            } else if (x==7 && y==4) {
+                tileSheet.setTextureRect(sf::IntRect(32, 96, 32, 32));
             } else {
                 tileSheet.setTextureRect(sf::IntRect(0, 64, 32, 32));
             }
@@ -111,13 +143,13 @@ void Game::draw(sf::RenderTarget *window,float alpha) {
                 // sf::Vector2f v = view.getCenter();
                 // sf::Vector2f p = it->second->sprite.getPosition();
                 //view.setCenter(v.x+(p.x-v.x)*chase,v.y+(p.y-v.y)*chase);
-                window->setView(view);
             }
             //view.setCenter(it->second->shape.getPosition());
             it->second->draw(*window);
             ++it;
         }
     }
+    window->setView(window->getDefaultView());
 }
 
 void Game::handleEvent(sf::Event event, sf::RenderWindow *window) {
@@ -139,6 +171,11 @@ bool Game::tick(sf::RenderWindow *window) {
         packet>>player;
         sf::Uint32 last = tickTarget;
         packet>>tickTarget;
+        sf::Uint8 tS;
+        packet>>tS;
+        if (tS > 0) {
+            shake = float(tS);
+        }
         if (tickTarget > last) {
 
             if (tickTarget-last > 2)
@@ -151,14 +188,25 @@ bool Game::tick(sf::RenderWindow *window) {
                 sf::Uint16 num;
                 sf::Uint8 frame;
                 bool first;
-                if (packet>>num>>x>>y>>angle>>frame>>first) {
+                sf::Uint8 count;
+                if (packet>>num>>x>>y>>angle>>frame>>count) {
+                    for (int i=0;i<count;i++) {
+                        sf::Uint8 sound;
+                        packet>>sound;
+                        sfx[tickTarget].push_back(sound);
+                    }
+                    packet>>first;
                     if (first) {
                         sf::Uint8 cNum;
                         packet>>cNum;
                         if (cNum == 1) {
-                            actors[num] = std::make_shared<Bullet>();
+                            std::shared_ptr<Bullet> b = std::make_shared<Bullet>();
+                            packet>>b->color;
+                            actors[num] = b;
                         } else if (cNum == 2) {
-                            actors[num] = std::make_shared<Player>();
+                            std::shared_ptr<Player> p = std::make_shared<Player>();
+                            packet>>p->color;
+                            actors[num] = p;
                         } else {
                             actors[num] = std::make_shared<Actor>();
                         }
@@ -193,6 +241,21 @@ bool Game::tick(sf::RenderWindow *window) {
             std::cout<<"QUICK\n";
         }
         tickCurrent++;
+        for (size_t i=0;i<sfx[tickCurrent].size();i++) {
+            SoundPlayer::getInstance()->playSound(sfxToName[sfx[tickCurrent][i]],sfxToVol[sfx[tickCurrent][i]]);
+        }
+
+        view2.setCenter(view.getCenter());
+
+        if (shake > 0) {
+            int angle = rand()%360;
+            float x=cos(angle*M_PI/180)*shake;
+            float y=sin(angle*M_PI/180)*shake;
+            view2.move(x,y);
+            shake-=0.4;
+        } else {
+            shake = 0;
+        }
     }
 
     input(window);
@@ -247,6 +310,12 @@ void Game::input(sf::RenderWindow *window) {
             packet<<sf::Uint8(0);
         }
 
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+            packet<<true;
+        } else {
+            packet<<false;
+        }
+
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left) || sf::Joystick::isButtonPressed(i, 3) || sf::Joystick::isButtonPressed(i, 0)) {
             packet<<true;
         } else {
@@ -255,8 +324,8 @@ void Game::input(sf::RenderWindow *window) {
 
         if (actors.size() > 0) {
             sf::Vector2i tm = sf::Mouse::getPosition(*window);
-            sf::Vector2f p = sf::Vector2f(tm.x,tm.y);
-            sf::Vector2f pos = actors[4+player]->pos;
+            sf::Vector2f p = window->mapPixelToCoords(tm,view);
+            sf::Vector2f pos = actors[5+player]->pos;
             p-=pos;
 
             packet<<float(std::atan2(p.y, p.x));

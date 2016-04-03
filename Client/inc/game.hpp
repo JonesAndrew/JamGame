@@ -17,13 +17,24 @@
 
 class Game : public Scene {
     std::map<sf::Uint16,std::shared_ptr<Actor> > actors;
+    std::map<sf::Uint16,std::vector<sf::Uint8> > sfx;
+    std::map<sf::Uint8,std::string> sfxToName;
+    std::map<sf::Uint8,int> sfxToVol;
+
     sf::TcpSocket socket;
     sf::UdpSocket *gameSocket;
+
     bool wait;
+
+    float shake;
+
     sf::Uint32 tickCurrent;
     sf::Uint32 tickTarget;
+
     sf::Uint16 player;
+
     sf::View view;
+    sf::View view2;
     sf::Sprite tileSheet;
 public:
     void start();

@@ -18,7 +18,7 @@ DCOMPILE_FLAGS = -D DEBUG
 # Add additional include paths
 INCLUDES = -I $(SRC_PATH)/inc
 # General linker settings
-LINK_FLAGS = -lsfml-graphics -lsfml-network -lsfml-window -lsfml-system -lm
+LINK_FLAGS = -lsfml-graphics -lsfml-audio -lsfml-network -lsfml-window -lsfml-system -lm
 # Additional release-specific linker settings
 RLINK_FLAGS =
 # Additional debug-specific linker settings

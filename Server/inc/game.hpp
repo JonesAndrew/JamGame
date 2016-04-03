@@ -13,6 +13,7 @@ protected:
     int gameNum;
     int w,h;
     int restartTime;
+    sf::Uint8 shake;
     sf::Uint32 tick;
     sf::Uint16 actorCount;
     std::vector<sf::Vector2i> dir;
@@ -23,6 +24,10 @@ public:
     sf::UdpSocket *socket;
 
     virtual void start();
+
+    void setShake(sf::Uint8);
+
+    void setRestartTime(int);
 
     void handleInput(sf::Packet packet,std::shared_ptr<PlayerNetwork> p);
 
@@ -35,7 +40,7 @@ public:
 
 struct Input {
     sf::Uint8 r,l,d,u;
-    bool s;
+    bool s,sh;
     bool pressed;
     float angle;
     Input() {

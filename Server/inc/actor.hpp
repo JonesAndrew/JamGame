@@ -40,6 +40,7 @@ struct Polygon : public Shape
     virtual bool intersectWith(Shape* s);
     virtual bool intersected(Shape* s);
     virtual bool intersectWith(Disk* d);
+    virtual bool intersectWith(Polygon* p);
 };
 
 struct Disk : public Shape {
@@ -70,6 +71,8 @@ protected:
 
 public:
 
+    std::vector<sf::Uint8> sfx;
+
     int time;
     int frameTime;
     sf::Uint8 frame;
@@ -82,6 +85,7 @@ public:
     VECTOR2 getPos();
 
     float getAngle();
+    void setAngle(float a);
 
     float getRadius();
 

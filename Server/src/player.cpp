@@ -9,19 +9,29 @@
     #define M_PI 3.14159265358979323846
 #endif
 
-Player::Player() : Actor() {
+Player::Player(sf::Uint8 c) : Actor() {
     pos = VECTOR2(50,100);
     anchor = 0;
     frame = 0;
-    radius = 16;
+    radius = 15;
+    color = c*2;
     state_ = nullptr;
     newState(new WalkState());
-    Disk *d = new Disk();
-    d->radius = radius;
-    shape = d;
-    accel = 0.6;
-    maxVel = 4.5;
-    deccel = 0.3;
+
+    // Disk *d = new Disk();
+    // d->radius = radius;
+    // shape = d;
+
+    Polygon *p = new Polygon();
+    p->points.emplace_back(radius,radius);
+    p->points.emplace_back(-radius,radius);
+    p->points.emplace_back(-radius,-radius);
+    p->points.emplace_back(radius,-radius);
+    shape = p;
+
+    accel = 0.3;
+    maxVel = 2.25;
+    deccel = 0.15;
     shotTime = 0;
     classNum = 2;
 }
@@ -30,6 +40,7 @@ void Player::res() {
     shotTime = 0;
     velocity = VECTOR2(0,0);
     dead = false;
+    newState(new WalkState());
 }
 
 float Player::getAccel() {
@@ -75,6 +86,9 @@ void Player::update()
 }
 
 sf::Uint8 Player::getFrame() {
+    if (shotTime > 44) {
+        return frame+20;
+    }
     return frame;
 }
 
@@ -86,8 +100,30 @@ void Player::collidedBy(std::shared_ptr<Actor> a) {
 }
 
 void Player::collideWith(std::shared_ptr<Bullet> b) {
-    if (b->time > 12) {
-        dead = true;
+    if (b->time > 8 && b->live) {
+        if (frame < 8) {
+            newState(new DeadState());
+            game->setRestartTime(60);
+            sfx.push_back(2);
+            game->setShake(20);
+        } else {
+            b->live = false;
+        }
+        game->setShake(10);
         b->setDead(true);
     }
 } 
+
+void Player::send(sf::Packet& p) {
+    p << num << getPos().x << getPos().y << angle << getFrame();
+    p << sf::Uint8(sfx.size());
+    for (int i=0;i<sfx.size();i++) {
+        p << sfx[i];
+    }
+    sfx.clear();
+    p << first;
+    if (first) {
+        p << classNum << color;
+        first = false;
+    }
+}

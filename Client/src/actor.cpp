@@ -1,4 +1,9 @@
 #include "actor.hpp"
+#include "vector2.hpp"
+
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
 
 Actor::Actor() {
 }
@@ -16,6 +21,7 @@ bool Actor::prep(sf::Uint32 t,float alpha) {
 
     pos = sf::Vector2f(x,y);
     angle = state[t].angle;
+    frame = state[t].frame;
     return false;
 }
 
@@ -24,24 +30,38 @@ void Actor::draw(sf::RenderTarget &window) {
 
 Bullet::Bullet() {
     sprite = TextureLoader::getInstance()->getSprite("guns.png");
-    sprite.setTextureRect(sf::IntRect(64, 0, 32, 32));
     sprite.setOrigin(16,16);
+    fire = TextureLoader::getInstance()->getSprite("guns.png");
+    fire.setTextureRect(sf::IntRect(224, 0, 32, 32));
+    fire.setOrigin(16,16);
 }
 
 void Bullet::draw(sf::RenderTarget &window) {
     sprite.setPosition(pos);
     sprite.setRotation(angle-90);
+    sprite.setTextureRect(sf::IntRect(64+32*color, 0, 32, 32));
+    fire.setPosition(pos);
+    fire.setRotation(angle-90);
+    fire.setTextureRect(sf::IntRect(224+32*frame, 0, 32, 32));
     window.draw(sprite);
+    window.draw(fire);
 }
 
 Player::Player() {
     sprite = TextureLoader::getInstance()->getSprite("slimes.png");
     face = TextureLoader::getInstance()->getSprite("face.png");
+    gun = TextureLoader::getInstance()->getSprite("guns.png");
+    shield = TextureLoader::getInstance()->getSprite("shields.png");
+    dead = TextureLoader::getInstance()->getSprite("death.png");
 
     sprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
+    gun.setTextureRect(sf::IntRect(0,0,32,32));
 
-    sprite.setOrigin(16,16);
-    face.setOrigin(16,16);
+    sprite.setOrigin(16,18);
+    face.setOrigin(16,18);
+    gun.setOrigin(16,16);
+    shield.setOrigin(32,42);
+    dead.setOrigin(48,42);
 }
 
 void Actor::inter(sf::Uint32 t1,sf::Uint32 t2) {
@@ -58,6 +78,30 @@ void Actor::inter(sf::Uint32 t1,sf::Uint32 t2) {
 }
 
 void Player::draw(sf::RenderTarget &window) {
+    sprite.setTextureRect(sf::IntRect((frame%20)*32, 32*color, 32, 32));
     sprite.setPosition(pos);
-    window.draw(sprite);
+
+    shield.setTextureRect(sf::IntRect((frame%20-8)*64,64*color,64,64));
+    shield.setPosition(pos);
+
+    dead.setTextureRect(sf::IntRect(((frame%20-13)%3)*96,64*color*2+64*((frame%20-13)/3),64,64));
+    dead.setPosition(pos);
+
+    face.setPosition(pos);
+
+    VECTOR2 hands = VECTOR2(0,5)%((angle-90)*M_PI/180);
+
+    gun.setPosition(pos+sf::Vector2f(hands.x,hands.y));
+    gun.setTextureRect(sf::IntRect((frame/20)*32,0,32,32));
+    gun.setRotation(angle-90);
+
+    if (frame%20 < 8) {
+        window.draw(sprite);
+        window.draw(face);
+    } else if (frame%20 < 13) {
+        window.draw(shield);
+    } else {
+        window.draw(dead);
+    }
+    window.draw(gun);
 }

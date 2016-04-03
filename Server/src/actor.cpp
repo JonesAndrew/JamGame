@@ -1,5 +1,6 @@
 #include "actor.hpp"
 #include "game.hpp"
+#include <SFML/Graphics.hpp>
 
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
@@ -62,6 +63,12 @@ bool Polygon::intersectWith(Disk* d) {
     return false;
 }
 
+bool Polygon::intersectWith(Polygon* p) {
+    sf::IntRect r1(pos.x-points[0].x,pos.y-points[0].y,points[0].x*2+1,points[0].y*2+1);
+    sf::IntRect r2(p->pos.x-p->points[0].x,p->pos.y-p->points[0].y,p->points[0].x*2+1,p->points[0].y*2+1);
+    return r1.intersects(r2);
+}
+
 bool Circle::intersectWith(Shape* s) {
     return s->intersected(this);
 }
@@ -122,6 +129,10 @@ VECTOR2 Actor::getPos() {
     return pos;
 }
 
+void Actor::setAngle(float a) {
+    angle = a;
+}
+
 float Actor::getAngle() {
     return angle;
 }
@@ -173,7 +184,13 @@ sf::Uint8 Actor::getFrame() {
 }
 
 void Actor::send(sf::Packet& p) {
-    p << num << getPos().x << getPos().y << angle << getFrame() << first;
+    p << num << getPos().x << getPos().y << angle << getFrame();
+    p << sf::Uint8(sfx.size());
+    for (int i=0;i<sfx.size();i++) {
+        p << sfx[i];
+    }
+    sfx.clear();
+    p << first;
     if (first) {
         p << classNum;
         first = false;

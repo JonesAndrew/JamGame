@@ -24,3 +24,16 @@ public:
 	virtual PlayerState* handleInput(Player& player, Input input);
 	virtual PlayerState* update(Player& player);
 };
+
+class ShieldState : public PlayerState {
+	int time;
+public:
+	virtual void enter(Player& player);
+	virtual PlayerState* update(Player& player);
+};
+
+class DeadState : public PlayerState {
+public:
+	virtual void enter(Player& player);
+	virtual PlayerState* update(Player& player);
+};

@@ -36,13 +36,16 @@ struct Actor {
 
 struct Player : public Actor {
     Player();
-    sf::Sprite sprite,face;
+    sf::Sprite sprite,face,gun,shield,dead;
+    sf::Uint8 color;
     virtual void draw(sf::RenderTarget &window);
 };
 
 struct Bullet : public Actor {
     Bullet();
     sf::Sprite sprite;
+    sf::Sprite fire;
+    sf::Uint8 color;
     virtual void draw(sf::RenderTarget &window);
 };
 

@@ -28,16 +28,20 @@ void Wall::collideWith(std::shared_ptr<Bullet> b) {
 	VECTOR2 dif = b->getPos()-pos;
 	VECTOR2 newpos;
 
+	int r = rand()%1000;
+	float off = (r-500)/10000.0;
+
 	if ((size.x/2)-abs(dif.x) > (size.y/2)-abs(dif.y)) {
 		newpos = VECTOR2(b->getPos().x,
 			pos.y+copysign((size.y/2)+b->getRadius(),dif.y));
-		b->setVelocity(VECTOR2(b->getVelocity().x,-b->getVelocity().y));
+		b->setVelocity(VECTOR2(b->getVelocity().x,-b->getVelocity().y)%off);
 	} else {
 		newpos = VECTOR2(pos.x+copysign((size.x/2)+b->getRadius(),dif.x),
 			b->getPos().y);
-		b->setVelocity(VECTOR2(-b->getVelocity().x,b->getVelocity().y));
+		b->setVelocity(VECTOR2(-b->getVelocity().x,b->getVelocity().y)%off);
 	}
 
+	b->sfx.push_back(0);
 	b->setPos(newpos);
 }
 
