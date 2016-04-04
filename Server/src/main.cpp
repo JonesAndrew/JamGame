@@ -310,6 +310,7 @@ int main()
 
         time_acc += time_delta;
 
+        int i=0;
         while (time_acc.asSeconds() >= dt) {
 
             sf::TcpSocket *socket = new sf::TcpSocket;
@@ -342,8 +343,12 @@ int main()
 
             }
 
-            //fps.update();
+            fps.update();
             time_acc = sf::seconds(time_acc.asSeconds()-dt);
+            i++;
+        }
+        if (i>1) {
+            std::cout<<"MULTI:"<<i<<"\n";
         }
     }
 
