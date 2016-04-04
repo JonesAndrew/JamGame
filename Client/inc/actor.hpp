@@ -32,6 +32,8 @@ struct Actor {
     sf::Uint8 classNum;
     std::map<sf::Uint32,ActorState> state;
     ActorState activeState;
+
+    virtual float getBot() {return pos.y;}
 };
 
 struct Player : public Actor {
@@ -47,6 +49,7 @@ struct Bullet : public Actor {
     sf::Sprite fire;
     sf::Uint8 color;
     virtual void draw(sf::RenderTarget &window);
+    virtual float getBot() {return pos.y-10;}
 };
 
 #endif

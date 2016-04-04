@@ -12,6 +12,9 @@ public:
 
     virtual void send(sf::Packet&);
 
+    virtual void collideWith(std::shared_ptr<Bullet> b);
+
     sf::Uint8 color;
     bool live;
+    int step;
 };

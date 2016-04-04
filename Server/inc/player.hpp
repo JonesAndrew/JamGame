@@ -11,7 +11,7 @@ class Player : public Actor {
     PlayerState* state_;
     float accel,deccel,maxVel;
 public:
-    int shotTime,shield;
+    int shotTime,shield,bulletCount;
     sf::Uint8 color;
 
     Player(sf::Uint8);
@@ -31,7 +31,7 @@ public:
 
     virtual void collideWith(std::shared_ptr<Actor>);
     virtual void collidedBy(std::shared_ptr<Actor>);
-    
+
     virtual void collideWith(std::shared_ptr<Bullet>);
 
     virtual void send(sf::Packet&);

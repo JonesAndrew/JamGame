@@ -34,9 +34,12 @@ Player::Player(sf::Uint8 c) : Actor() {
     deccel = 0.15;
     shotTime = 0;
     classNum = 2;
+
+    bulletCount = 6;
 }
 
 void Player::res() {
+    bulletCount = 6;
     shotTime = 0;
     velocity = VECTOR2(0,0);
     dead = false;
@@ -106,13 +109,23 @@ void Player::collideWith(std::shared_ptr<Bullet> b) {
             game->setRestartTime(60);
             sfx.push_back(2);
             game->setShake(20);
+            b->setDead(true);
         } else {
             b->live = false;
+            if (b->getPos().x > pos.x) {
+                b->setVelocity(VECTOR2(0.5,-3));
+                b->setAngle(180);
+            } else {
+                b->setVelocity(VECTOR2(-0.5,-3));
+                b->setAngle(0);
+            }
         }
         game->setShake(10);
+    } else if (b->step == 2 && bulletCount < 6) {
         b->setDead(true);
+        bulletCount++;
     }
-} 
+}
 
 void Player::send(sf::Packet& p) {
     p << num << getPos().x << getPos().y << angle << getFrame();

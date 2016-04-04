@@ -70,13 +70,14 @@ PlayerState* WalkState::handleInput(Player& player, Input input) {
 	player.setAngle(input.angle/M_PI*180);
 
 	if (player.shotTime <= 0) {
-		if (input.s) {
+		if (input.s && player.bulletCount > 0) {
 			player.sfx.push_back(1);
 			player.game->setShake(5);
 			VECTOR2 hand(12,0);
 			hand%=input.angle;
 			player.game->makeActor(std::make_shared<Bullet>(player.getPos()+hand,input.angle,player.color));
 			player.shotTime = 60;
+            player.bulletCount--;
 		}
 	}
 

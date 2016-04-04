@@ -28,6 +28,8 @@ class Game : public Scene {
 
     float shake;
 
+    float lastAngle[2];
+
     sf::Uint32 tickCurrent;
     sf::Uint32 tickTarget;
 

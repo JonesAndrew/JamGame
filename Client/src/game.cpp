@@ -25,6 +25,10 @@
 sf::IpAddress server = "127.0.0.1";
 unsigned short port = 50000;
 
+bool comparator(const std::shared_ptr<Actor> &a, const std::shared_ptr<Actor> &b) {
+    return a->getBot() < b->getBot();
+}
+
 void Game::setupScene(sf::RenderWindow &window) {
     gameSocket = new sf::UdpSocket();
     if (gameSocket->bind(0) != sf::Socket::Done)
@@ -81,6 +85,10 @@ void Game::setupScene(sf::RenderWindow &window) {
     sfxToVol[3]  = 60;
 
     shake = 0;
+
+    for (int i=0;i<2;i++) {
+        lastAngle[i] = 0;
+    }
 }
 
 void Game::start() {
@@ -129,6 +137,7 @@ void Game::draw(sf::RenderTarget *window,float alpha) {
         alpha = 1;
     }
     alpha = 1;
+    std::vector<std::shared_ptr<Actor>> acts;
     for (auto it = actors.cbegin(); it != actors.cend() /* not hoisted */; /* no increment */)
     {
         if (tickCurrent > 10 && it->second->prep(tickCurrent,alpha))
@@ -138,17 +147,17 @@ void Game::draw(sf::RenderTarget *window,float alpha) {
         }
         else
         {
-            if (it->first == 0) {
-                // float chase=0.06;
-                // sf::Vector2f v = view.getCenter();
-                // sf::Vector2f p = it->second->sprite.getPosition();
-                //view.setCenter(v.x+(p.x-v.x)*chase,v.y+(p.y-v.y)*chase);
-            }
-            //view.setCenter(it->second->shape.getPosition());
-            it->second->draw(*window);
+            acts.push_back(it->second);
             ++it;
         }
     }
+
+    std::sort(acts.begin(), acts.end(), comparator);
+
+    for (size_t i=0;i<acts.size();i++) {
+        acts[i]->draw(*window);
+    }
+
     window->setView(window->getDefaultView());
 }
 
@@ -310,30 +319,36 @@ void Game::input(sf::RenderWindow *window) {
             packet<<sf::Uint8(0);
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)  || sf::Joystick::isButtonPressed(i, 4)) {
             packet<<true;
         } else {
             packet<<false;
         }
 
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left) || sf::Joystick::isButtonPressed(i, 3) || sf::Joystick::isButtonPressed(i, 0)) {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left) || sf::Joystick::isButtonPressed(i, 5)) {
             packet<<true;
         } else {
             packet<<false;
         }
 
-        if (actors.size() > 0) {
-            sf::Vector2i tm = sf::Mouse::getPosition(*window);
-            sf::Vector2f p = window->mapPixelToCoords(tm,view);
-            sf::Vector2f pos = actors[5+player]->pos;
-            p-=pos;
+        if (PLAYERS == 1) {
+            if (actors.size() > 0) {
+                sf::Vector2i tm = sf::Mouse::getPosition(*window);
+                sf::Vector2f p = window->mapPixelToCoords(tm,view);
+                sf::Vector2f pos = actors[5+player]->pos;
+                p-=pos;
 
-            packet<<float(std::atan2(p.y, p.x));
+                packet<<float(std::atan2(p.y, p.x));
+            } else {
+                packet<<float(0);
+            }
         } else {
-            packet<<float(0);
+            if (abs(sf::Joystick::getAxisPosition(i, sf::Joystick::Z)) > 15 ||
+                abs(sf::Joystick::getAxisPosition(i, sf::Joystick::R)) > 15) {
+                lastAngle[i] = float(std::atan2(sf::Joystick::getAxisPosition(i, sf::Joystick::Z), sf::Joystick::getAxisPosition(i, sf::Joystick::R)));
+            }
+            packet<<lastAngle[i];
         }
-        
-
     }
     gameSocket->send(packet,server,port);
 }

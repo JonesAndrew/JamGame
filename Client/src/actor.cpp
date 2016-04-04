@@ -44,7 +44,9 @@ void Bullet::draw(sf::RenderTarget &window) {
     fire.setRotation(angle-90);
     fire.setTextureRect(sf::IntRect(224+32*frame, 0, 32, 32));
     window.draw(sprite);
-    window.draw(fire);
+    if (frame < 2) {
+        window.draw(fire);
+    }
 }
 
 Player::Player() {
@@ -95,6 +97,9 @@ void Player::draw(sf::RenderTarget &window) {
     gun.setTextureRect(sf::IntRect((frame/20)*32,0,32,32));
     gun.setRotation(angle-90);
 
+    if (angle < 0) {
+        window.draw(gun);
+    }
     if (frame%20 < 8) {
         window.draw(sprite);
         window.draw(face);
@@ -103,5 +108,7 @@ void Player::draw(sf::RenderTarget &window) {
     } else {
         window.draw(dead);
     }
-    window.draw(gun);
+    if (angle >= 0) {
+        window.draw(gun);
+    }
 }
