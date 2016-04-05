@@ -16,7 +16,7 @@
 // #include "ResourcePath.hpp"
 #endif
 
-#define PLAYERS 2
+#define PLAYERS 1
 
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
@@ -237,7 +237,7 @@ bool Game::tick(sf::RenderWindow *window) {
     sf::Uint32 diff = tickTarget-tickCurrent;
     //std::cout<<"DIFF:"<<diff<<"\n";
 
-    if (diff >= 2) {
+    if (diff >= 4) {
         wait = false;
     }
     if (diff == 0) {
@@ -245,7 +245,7 @@ bool Game::tick(sf::RenderWindow *window) {
         std::cout<<"WAIT\n";
     }
     if (!wait) {
-        if (diff >= 5) {
+        if (diff >= 8) {
             tickCurrent++;
             std::cout<<"QUICK\n";
         }
