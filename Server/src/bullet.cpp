@@ -92,6 +92,7 @@ void Bullet::collideWith(std::shared_ptr<Bullet> b) {
         double distance = collision.mag();
         collision /= distance;
         double aci = getVelocity().dot(collision);
+
         double bci = b->getVelocity().dot(collision);
 
         double acf = bci;

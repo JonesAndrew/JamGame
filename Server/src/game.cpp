@@ -3,7 +3,7 @@
 #include "wall.hpp"
 #include <iostream>
 
-#define NETWORK_UPDATE_RATE 1
+#define NETWORK_UPDATE_RATE 2
 
 void Game::start() {
     actors.clear();
