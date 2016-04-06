@@ -19,7 +19,7 @@ void Game::start() {
     int sizeY = 13;
 
     makeActor(std::make_shared<Wall>(VECTOR2((sizeX+1)/2*32,14),VECTOR2(sizeX*32,20)));
-    makeActor(std::make_shared<Wall>(VECTOR2((sizeX+1)/2*32,(sizeY-1)*32+10),VECTOR2(sizeX*3,20)));
+    makeActor(std::make_shared<Wall>(VECTOR2((sizeX+1)/2*32,(sizeY-1)*32+10),VECTOR2(sizeX*32,20)));
     makeActor(std::make_shared<Wall>(VECTOR2(22 ,(sizeY+1)/2*32),VECTOR2(20,sizeY*32)));
     makeActor(std::make_shared<Wall>(VECTOR2((sizeX-1)*32+10,(sizeY+1)/2*32),VECTOR2(20,sizeY*32)));
     //makeActor(std::make_shared<Wall>(VECTOR2(16+7*32,12+4*32),VECTOR2(32,24)));
