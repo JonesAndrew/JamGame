@@ -35,11 +35,6 @@ private:
 };
 
 class Director {
-
-    sf::RenderTexture texture;
-
-    sf::Sprite sprite;
-
     sf::Clock timer;
 
     sf::Time time_now;
@@ -53,6 +48,7 @@ class Director {
     Scene *nextScene;
 
     bool next;
+    float scale;
 
     static Director *instance;
 
@@ -63,6 +59,7 @@ public:
     sf::RenderWindow window;
     bool running;
     void initialize();
+    float getScale();
 
     static Director *getInstance();
     sf::RenderWindow *getWindow();

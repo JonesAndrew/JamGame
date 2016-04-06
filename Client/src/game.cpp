@@ -16,7 +16,7 @@
 // #include "ResourcePath.hpp"
 #endif
 
-#define PLAYERS 1
+#define PLAYERS 2
 
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
@@ -35,7 +35,7 @@ void Game::setupScene(sf::RenderWindow &window) {
     {
         // error...
     }
-    if (PLAYERS == 2) {
+    if (PLAYERS == 1) {
         server = "127.0.0.1";
     } else {
         server = "104.236.122.65";
@@ -64,8 +64,8 @@ void Game::setupScene(sf::RenderWindow &window) {
 
     start();
     view = window.getView();
-    view.zoom(0.5);
-    view.setCenter(7.5*32,4.5*32);
+    view.zoom(1/Director::getInstance()->getScale());
+    view.setCenter(11.5*32,6.5*32);
     view2 = view;
     tileSheet = TextureLoader::getInstance()->getSprite("tiles.png");
     tileSheet.setTextureRect(sf::IntRect(0, 64, 32, 32));
@@ -105,26 +105,26 @@ void Game::draw(sf::RenderTarget *window,float alpha) {
     } else {
         window->setView(view2);
     }
-    for (int x=0;x<15;x++) {
-        for (int y=0;y<9;y++) {
+    int sizeX=23;
+    int sizeY=13;
+    for (int x=0;x<sizeX;x++) {
+        for (int y=0;y<sizeY;y++) {
             if (x==0 && y==0) {
                 tileSheet.setTextureRect(sf::IntRect(0, 0, 32, 32));
-            } else if (x==14 && y==0) {
+            } else if (x==sizeX-1 && y==0) {
                 tileSheet.setTextureRect(sf::IntRect(32, 0, 32, 32));
-            } else if (x==0 && y==8) {
+            } else if (x==0 && y==sizeY-1) {
                 tileSheet.setTextureRect(sf::IntRect(64, 0, 32, 32));
-            } else if (x==14 && y==8) {
+            } else if (x==sizeX-1 && y==sizeY-1) {
                 tileSheet.setTextureRect(sf::IntRect(96, 0, 32, 32));
             } else if (x==0) {
                 tileSheet.setTextureRect(sf::IntRect(96, 32, 32, 32));
-            } else if (x==14) {
+            } else if (x==sizeX-1) {
                 tileSheet.setTextureRect(sf::IntRect(64, 32, 32, 32));
             } else if (y==0) {
                 tileSheet.setTextureRect(sf::IntRect(0, 32, 32, 32));
-            } else if (y==8) {
+            } else if (y==sizeY-1) {
                 tileSheet.setTextureRect(sf::IntRect(32, 32, 32, 32));
-            } else if (x==7 && y==4) {
-                tileSheet.setTextureRect(sf::IntRect(32, 96, 32, 32));
             } else {
                 tileSheet.setTextureRect(sf::IntRect(0, 64, 32, 32));
             }
@@ -214,6 +214,7 @@ bool Game::tick(sf::RenderWindow *window) {
                             actors[num] = b;
                         } else if (cNum == 2) {
                             std::shared_ptr<Player> p = std::make_shared<Player>();
+                            players.push_back(p);
                             packet>>p->color;
                             actors[num] = p;
                         } else {
@@ -335,7 +336,7 @@ void Game::input(sf::RenderWindow *window) {
             if (actors.size() > 0) {
                 sf::Vector2i tm = sf::Mouse::getPosition(*window);
                 sf::Vector2f p = window->mapPixelToCoords(tm,view);
-                sf::Vector2f pos = actors[5+player]->pos;
+                sf::Vector2f pos = players[player]->pos;
                 p-=pos;
 
                 packet<<float(std::atan2(p.y, p.x));

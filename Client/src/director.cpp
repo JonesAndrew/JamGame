@@ -29,11 +29,35 @@ Director *Director::getInstance() {
     return instance;
 }
 
+float Director::getScale() {
+    return scale;
+}
+
 void Director::initialize() {
-    window.create(sf::VideoMode(960, 540), "Bullets", sf::Style::Default);
-    texture.create(1280,720);
+    std::vector<sf::VideoMode> modes = sf::VideoMode::getFullscreenModes();
+    for (std::size_t i = 0; i < modes.size(); ++i)
+    {
+        sf::VideoMode mode = modes[i];
+        std::cout << "Mode #" << i << ": "
+                  << mode.width << "x" << mode.height << " - "
+                  << mode.bitsPerPixel << " bpp" << std::endl;
+    }
+
+    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+    sf::VideoMode big = sf::VideoMode(1920, 1080);
+    sf::VideoMode small = sf::VideoMode(960, 540);
+    std::cout<<"960: "<< small.isValid()<<"\n";
+    // Create a window with the same pixel depth as the desktop
+
+    if (big.width > desktop.width) {
+        window.create(small, "Bullets", sf::Style::Default);
+        scale = 1;
+    } else {
+        window.create(big, "Bullets", sf::Style::Default);
+        scale = 2;
+    }
+
     window.setVerticalSyncEnabled(true);
-    sprite.setTexture(texture.getTexture(), true);
     currentScene = NULL;
 
     timer.restart();

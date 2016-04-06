@@ -17,6 +17,7 @@
 
 class Game : public Scene {
     std::map<sf::Uint16,std::shared_ptr<Actor> > actors;
+    std::vector<std::shared_ptr<Player>> players;
     std::map<sf::Uint16,std::vector<sf::Uint8> > sfx;
     std::map<sf::Uint8,std::string> sfxToName;
     std::map<sf::Uint8,int> sfxToVol;
