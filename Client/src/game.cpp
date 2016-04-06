@@ -35,7 +35,7 @@ void Game::setupScene(sf::RenderWindow &window) {
     {
         // error...
     }
-    if (PLAYERS == 1) {
+    if (PLAYERS == 2) {
         server = "127.0.0.1";
     } else {
         server = "104.236.122.65";

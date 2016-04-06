@@ -26,7 +26,7 @@ void Game::start() {
 
     for (int i=0; i<2; i++) {
         gamePlayers.push_back(std::make_shared<Player>(i));
-        gamePlayers.back()->setPos(VECTOR2(32+32*12.5*i,32+32*6.5*i));
+        gamePlayers.back()->setPos(VECTOR2(32+32*(sizeX-2)*i,32+32*(sizeY-2)*i));
         makeActor(gamePlayers.back());
     }
 
@@ -64,8 +64,10 @@ void Game::update() {
             actors.erase(actors.begin()+7,actors.end());
         }
         for (int i=0; i<2; i++) {
+            int sizeX = 23;
+            int sizeY = 13;
             gamePlayers[i]->res();
-            gamePlayers[i]->setPos(VECTOR2(32+32*12.5*i,32+32*6.5*i));
+            gamePlayers[i]->setPos(VECTOR2(32+32*(sizeX-2)*i,32+32*(sizeY-2)*i));
         }
     }
 
