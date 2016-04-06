@@ -76,7 +76,7 @@ PlayerState* WalkState::handleInput(Player& player, Input input) {
 			VECTOR2 hand(12,0);
 			hand%=input.angle;
 			player.game->makeActor(std::make_shared<Bullet>(player.getPos()+hand,input.angle,player.color));
-			player.shotTime = 60;
+			player.shotTime = 40;
             player.bulletCount--;
 		}
 	}

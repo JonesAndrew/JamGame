@@ -108,7 +108,7 @@ void Player::collideWith(std::shared_ptr<Bullet> b) {
             newState(new DeadState());
             game->setRestartTime(60);
             sfx.push_back(2);
-            game->setShake(20);
+            game->setShake(10);
             b->setDead(true);
         } else {
             b->live = false;
@@ -120,7 +120,7 @@ void Player::collideWith(std::shared_ptr<Bullet> b) {
                 b->setAngle(0);
             }
         }
-        game->setShake(10);
+        game->setShake(5);
     } else if (b->step == 2 && bulletCount < 6) {
         b->setDead(true);
         bulletCount++;
