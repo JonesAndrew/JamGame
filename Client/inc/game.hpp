@@ -34,7 +34,13 @@ class Game : public Scene {
     sf::Uint32 tickCurrent;
     sf::Uint32 tickTarget;
 
+    sf::Font font;
+
+    sf::Text s1,s2,mid;
+
     sf::Uint16 player;
+
+    sf::Uint8 score[2];
 
     sf::View view;
     sf::View view2;

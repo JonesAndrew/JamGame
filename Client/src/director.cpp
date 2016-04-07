@@ -50,12 +50,13 @@ void Director::initialize() {
     // Create a window with the same pixel depth as the desktop
 
     if (big.width > desktop.width) {
-        window.create(small, "Bullets", sf::Style::Default);
+        window.create(small, "Bullets", sf::Style::Fullscreen);
         scale = 1;
     } else {
-        window.create(big, "Bullets", sf::Style::Default);
+        window.create(big, "Bullets", sf::Style::Fullscreen);
         scale = 2;
     }
+    //window.setMouseCursorVisible(false);
 
     window.setVerticalSyncEnabled(true);
     currentScene = NULL;
@@ -65,7 +66,6 @@ void Director::initialize() {
 
 void Director::startWithScene(Scene *scene) {
     nextScene = scene;
-
 
     do {
         if (currentScene != NULL) {
