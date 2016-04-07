@@ -13,6 +13,7 @@ protected:
     int gameNum;
     int w,h;
     int restartTime;
+    sf::Uint8 score[2];
     sf::Uint8 shake;
     sf::Uint32 tick;
     sf::Uint16 actorCount;
@@ -28,6 +29,8 @@ public:
     void setShake(sf::Uint8);
 
     void setRestartTime(int);
+
+    void addPoint(int);
 
     void handleInput(sf::Packet packet,std::shared_ptr<PlayerNetwork> p);
 
