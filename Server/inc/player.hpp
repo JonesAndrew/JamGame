@@ -10,6 +10,7 @@ class PlayerState;
 class Player : public Actor {
     PlayerState* state_;
     float accel,deccel,maxVel;
+    bool splat;
 public:
     int shotTime,shield,bulletCount;
     sf::Uint8 color;

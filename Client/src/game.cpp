@@ -75,6 +75,19 @@ void Game::setupScene(sf::RenderWindow &window) {
     SoundPlayer::getInstance()->loadSound("death.wav");
     SoundPlayer::getInstance()->loadSound("shield.wav");
 
+    font.loadFromFile("res/kenpixel_square.ttf");
+
+    s1.setFont(font);
+    s1.setCharacterSize(32);
+    s1.setColor(sf::Color(254,115,127));
+    s2.setFont(font);
+    s2.setCharacterSize(32);
+    s2.setColor(sf::Color(127,192,2));
+    mid.setFont(font);
+    mid.setCharacterSize(32);
+    mid.setColor(sf::Color(255,255,255));
+    mid.setString(":");
+
     sfxToName[0] = "hit.wav";
     sfxToVol[0]  = 25;
     sfxToName[1] = "shoot.wav";
@@ -86,8 +99,15 @@ void Game::setupScene(sf::RenderWindow &window) {
 
     shake = 0;
 
+    s1.setPosition(int(window.getView().getSize().x/2-32),10);
+    s2.setPosition(int(window.getView().getSize().x/2+32),10);
+    mid.setPosition(int(window.getView().getSize().x/2),10);
+    sf::FloatRect textRect = mid.getLocalBounds();
+    mid.setOrigin(int(textRect.left + textRect.width/2.0f),0);
+
     for (int i=0;i<2;i++) {
         lastAngle[i] = 0;
+        score[i] = 0;
     }
 }
 
@@ -125,6 +145,8 @@ void Game::draw(sf::RenderTarget *window,float alpha) {
                 tileSheet.setTextureRect(sf::IntRect(0, 32, 32, 32));
             } else if (y==sizeY-1) {
                 tileSheet.setTextureRect(sf::IntRect(32, 32, 32, 32));
+            } else if (x==(sizeX-1)/2 && y==(sizeY-1)/2) {
+                tileSheet.setTextureRect(sf::IntRect(32, 96, 32, 32));
             } else {
                 tileSheet.setTextureRect(sf::IntRect(0, 64, 32, 32));
             }
@@ -159,6 +181,20 @@ void Game::draw(sf::RenderTarget *window,float alpha) {
     }
 
     window->setView(window->getDefaultView());
+
+    if (std::to_string(int(score[0])) != s1.getString()) {
+        s1.setString(std::to_string(int(score[0])));
+        sf::FloatRect textRect = s1.getLocalBounds();
+        s1.setOrigin(int(textRect.left + textRect.width/2.0f),0);
+    }
+    if (std::to_string(int(score[1])) != s2.getString()) {
+        s2.setString(std::to_string(int(score[1])));
+        sf::FloatRect textRect = s2.getLocalBounds();
+        s2.setOrigin(int(textRect.left + textRect.width/2.0f),0);
+    }
+    window->draw(s1);
+    window->draw(s2);
+    window->draw(mid);
 }
 
 void Game::handleEvent(sf::Event event, sf::RenderWindow *window) {
@@ -181,7 +217,7 @@ bool Game::tick(sf::RenderWindow *window) {
         sf::Uint32 last = tickTarget;
         packet>>tickTarget;
         sf::Uint8 tS;
-        packet>>tS;
+        packet>>tS>>score[0]>>score[1];
         if (tS > 0) {
             shake = float(tS);
         }

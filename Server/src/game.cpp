@@ -22,15 +22,14 @@ void Game::start() {
     makeActor(std::make_shared<Wall>(VECTOR2((sizeX+1)/2*32,(sizeY-1)*32+10),VECTOR2(sizeX*32,20)));
     makeActor(std::make_shared<Wall>(VECTOR2(22 ,(sizeY+1)/2*32),VECTOR2(20,sizeY*32)));
     makeActor(std::make_shared<Wall>(VECTOR2((sizeX-1)*32+10,(sizeY+1)/2*32),VECTOR2(20,sizeY*32)));
-    //makeActor(std::make_shared<Wall>(VECTOR2(16+7*32,12+4*32),VECTOR2(32,24)));
+    makeActor(std::make_shared<Wall>(VECTOR2(16+(sizeX-1)/2*32,12+(sizeY-1)/2*32),VECTOR2(32,24)));
 
     for (int i=0; i<2; i++) {
         gamePlayers.push_back(std::make_shared<Player>(i));
         gamePlayers.back()->setPos(VECTOR2(32+32*(sizeX-2)*i,32+32*(sizeY-2)*i));
         makeActor(gamePlayers.back());
+        score[i] = 0;
     }
-
-    //makeActor(std::make_shared<Bullet>());
 }
 
 void Game::setShake(sf::Uint8 s) {
@@ -43,6 +42,10 @@ void Game::setRestartTime(int r) {
     if (restartTime < 0) {
         restartTime = r;
     }
+}
+
+void Game::addPoint(int i) {
+    score[i]++;
 }
 
 void Game::update() {
@@ -94,7 +97,7 @@ void Game::update() {
         sf::Packet packet;
         sf::Uint16 t=0;
 
-        packet<<tick<<shake;
+        packet<<tick<<shake<<score[0]<<score[1];
 
         shake = 0;
 

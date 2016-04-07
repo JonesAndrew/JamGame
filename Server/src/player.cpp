@@ -16,8 +16,6 @@ Player::Player(sf::Uint8 c) : Actor() {
     radius = 15;
     color = c*2;
     state_ = nullptr;
-    newState(new WalkState());
-
     // Disk *d = new Disk();
     // d->radius = radius;
     // shape = d;
@@ -32,10 +30,9 @@ Player::Player(sf::Uint8 c) : Actor() {
     accel = 0.3;
     maxVel = 2.25;
     deccel = 0.15;
-    shotTime = 0;
     classNum = 2;
 
-    bulletCount = 6;
+    res();
 }
 
 void Player::res() {
@@ -43,6 +40,7 @@ void Player::res() {
     shotTime = 0;
     velocity = VECTOR2(0,0);
     dead = false;
+    splat = false;
     newState(new WalkState());
 }
 
@@ -103,27 +101,31 @@ void Player::collidedBy(std::shared_ptr<Actor> a) {
 }
 
 void Player::collideWith(std::shared_ptr<Bullet> b) {
-    if (b->time > 8 && b->live) {
-        if (frame < 8) {
-            newState(new DeadState());
-            game->setRestartTime(60);
-            sfx.push_back(2);
-            game->setShake(10);
-            b->setDead(true);
-        } else {
-            b->live = false;
-            if (b->getPos().x > pos.x) {
-                b->setVelocity(VECTOR2(0.5,-3));
-                b->setAngle(180);
+    if (!splat) {
+        if (b->time > 8 && b->live) {
+            if (frame < 8) {
+                newState(new DeadState());
+                game->setRestartTime(60);
+                game->addPoint(1-(color/2));
+                sfx.push_back(2);
+                game->setShake(10);
+                b->setDead(true);
+                splat = true;
             } else {
-                b->setVelocity(VECTOR2(-0.5,-3));
-                b->setAngle(0);
+                b->live = false;
+                if (b->getPos().x > pos.x) {
+                    b->setVelocity(VECTOR2(0.5,-3));
+                    b->setAngle(180);
+                } else {
+                    b->setVelocity(VECTOR2(-0.5,-3));
+                    b->setAngle(0);
+                }
             }
+            game->setShake(5);
+        } else if (b->step == 2 && bulletCount < 6) {
+            b->setDead(true);
+            bulletCount++;
         }
-        game->setShake(5);
-    } else if (b->step == 2 && bulletCount < 6) {
-        b->setDead(true);
-        bulletCount++;
     }
 }
 
