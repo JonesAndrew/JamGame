@@ -15,6 +15,34 @@
 #include <memory>
 #include "actor.hpp"
 
+class Label {
+    sf::Text text;
+
+    bool center;
+private:
+    void setCentered(bool c) {
+        center = c;
+    }
+
+    void setText(std::string set) {
+        if (text.getString() != set) {
+            text.setString(set);
+            pos();
+        }
+    }
+
+    void pos() {
+        if (center) {
+            sf::FloatRect textRect = text.getLocalBounds();
+            text.setOrigin(int(textRect.left + textRect.width/2.0f),0);
+        }
+    }
+
+    void setPos(int x, int y) {
+        text.setPosition(x,y);
+    }
+};
+
 class Game : public Scene {
     std::map<sf::Uint16,std::shared_ptr<Actor> > actors;
     std::vector<std::shared_ptr<Player>> players;
