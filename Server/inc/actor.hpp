@@ -14,7 +14,7 @@ struct Disk;
 struct Circle;
 struct Polygon;
 
-struct Shape 
+struct Shape
 {
     VECTOR2 pos;
     float angle;
@@ -63,13 +63,13 @@ protected:
     float angle,radius;
 
     sf::Uint16 num;
-    Shape *shape;
 
     bool first,dead;
     int deadCount;
     sf::Uint8 anchor,classNum;
 
 public:
+    Shape *shape;
 
     std::vector<sf::Uint8> sfx;
 

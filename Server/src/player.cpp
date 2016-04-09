@@ -20,12 +20,18 @@ Player::Player(sf::Uint8 c) : Actor() {
     // d->radius = radius;
     // shape = d;
 
-    Polygon *p = new Polygon();
-    p->points.emplace_back(radius,radius);
-    p->points.emplace_back(-radius,radius);
-    p->points.emplace_back(-radius,-radius);
-    p->points.emplace_back(radius,-radius);
-    shape = p;
+    nPol = new Polygon();
+    nPol->points.emplace_back(radius,radius);
+    nPol->points.emplace_back(-radius,radius);
+    nPol->points.emplace_back(-radius,-radius);
+    nPol->points.emplace_back(radius,-radius);
+    shape = nPol;
+
+    sPol = new Polygon();
+    sPol->points.emplace_back(radius*2,radius*2);
+    sPol->points.emplace_back(-radius*2,radius*2);
+    sPol->points.emplace_back(-radius*2,-radius*2);
+    sPol->points.emplace_back(radius*2,-radius*2);
 
     accel = 0.3;
     maxVel = 2.25;
@@ -149,7 +155,7 @@ void Player::collidedBy(std::shared_ptr<Actor> a) {
 }
 
 void Player::collideWith(std::shared_ptr<Bullet> bul) {
-    if (!splat && (frame < 8 || frame >= 12)) {
+    if (!splat) {
         if (bul->time > 8 && bul->live) {
             if (frame < 8) {
                 newState(new DeadState());
@@ -159,7 +165,7 @@ void Player::collideWith(std::shared_ptr<Bullet> bul) {
                 game->setShake(10);
                 bul->setDead(true);
                 splat = true;
-            } else {
+            } else if (frame >= 12) {
                 bul->live = false;
                 if (bul->getPos().x > pos.x) {
                     bul->setVelocity(VECTOR2(0.5,-3));

@@ -23,6 +23,7 @@ void WalkState::enter(Player& player) {
 	stopped = true;
 	player.frameTime = 0;
 	player.frame = 0;
+    player.shape = player.nPol;
 }
 
 PlayerState* WalkState::update(Player& player) {
@@ -107,7 +108,7 @@ PlayerState* WalkState::handleInput(Player& player, Input input) {
 			return new ShieldState();
 		} else if (player.dodgeTime <= 0) {
 			player.dodgeTime = 40;
-			player.setVelocity(VECTOR2(player.getMaxVel(),0)%std::atan2(i.y,i.x));
+			player.setVelocity(VECTOR2(player.getMaxVel()*1.5,0)%std::atan2(i.y,i.x));
 			return new RollState();
 		}
 	}
@@ -141,6 +142,7 @@ void ShieldState::enter(Player& player) {
 	player.frame=12;
 	player.frameTime = 0;
 	time = 40;
+    player.shape = player.sPol;
 }
 
 PlayerState* ShieldState::update(Player& player) {
