@@ -50,7 +50,7 @@ void Director::initialize() {
     // Create a window with the same pixel depth as the desktop
 
     if (big.width > desktop.width) {
-        window.create(small, "Bullets", sf::Style::Fullscreen);
+        window.create(small, "Bullets", sf::Style::Default);
         scale = 1;
     } else {
         window.create(big, "Bullets", sf::Style::Fullscreen);

@@ -7,7 +7,7 @@ public:
 	virtual void collideWith(std::shared_ptr<Actor>);
     virtual void collidedBy(std::shared_ptr<Actor>);
 
-    Bullet(VECTOR2,float,sf::Uint8);
+    Bullet(VECTOR2,float,float,sf::Uint8);
     virtual void update();
 
     virtual void send(sf::Packet&);
@@ -17,4 +17,7 @@ public:
     sf::Uint8 color;
     bool live;
     int step;
+    std::shared_ptr<Bullet> last;
+    int countdown;
+    float speed;
 };

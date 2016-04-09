@@ -37,8 +37,8 @@ struct Actor {
 };
 
 struct Player : public Actor {
-    Player();
-    sf::Sprite sprite,face,gun,shield,dead;
+    Player(sf::Uint8 c);
+    sf::Sprite sprite,gun;
     sf::Uint8 color;
     virtual void draw(sf::RenderTarget &window);
 };
@@ -49,7 +49,12 @@ struct Bullet : public Actor {
     sf::Sprite fire;
     sf::Uint8 color;
     virtual void draw(sf::RenderTarget &window);
-    virtual float getBot() {return pos.y-10;}
+    virtual float getBot() {
+        if (frame < 2) {
+            return pos.y+100;
+        } 
+        return pos.y-10;
+    }
 };
 
 #endif

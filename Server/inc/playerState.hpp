@@ -25,6 +25,12 @@ public:
 	virtual PlayerState* update(Player& player);
 };
 
+class RollState : public PlayerState {
+public:
+	virtual void enter(Player& player);
+	virtual PlayerState* update(Player& player);
+};
+
 class ShieldState : public PlayerState {
 	int time;
 public:

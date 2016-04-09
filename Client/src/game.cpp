@@ -10,6 +10,7 @@
 #include "game.hpp"
 #include "textureLoader.hpp"
 #include "sound.hpp"
+#include "vector2.hpp"
 #include <cmath>
 #ifdef _WIN32
 #else
@@ -30,6 +31,78 @@ bool comparator(const std::shared_ptr<Actor> &a, const std::shared_ptr<Actor> &b
 }
 
 void Game::setupScene(sf::RenderWindow &window) {
+    start();
+
+    windowSize = window.getView().getSize();
+    view = window.getView();
+    view.zoom(1/Director::getInstance()->getScale());
+    view.setCenter(11.5*32,6.5*32);
+    view2 = view;
+
+    tileSheet = TextureLoader::getInstance()->getSprite("tiles.png");
+    tileSheet.setTextureRect(sf::IntRect(0, 64, 32, 32));
+
+    bullets = TextureLoader::getInstance()->getSprite("bulletsUi.png");
+    bullets.setOrigin(16,16);
+    bullets.setPosition(windowSize.x/2-96,windowSize.y-47);
+
+    for (int i=0;i<2;i++) {
+        gun[i] = TextureLoader::getInstance()->getSprite("gunsUi.png");
+        gun[i].setTextureRect(sf::IntRect(0,54*2*i,54,54));
+        gun[i].setOrigin(27,27);
+        gun[i].setPosition(windowSize.x/2-96+(96*2*i),windowSize.y-47);
+        rotCurrent[i] = 0;
+        rotTarget.emplace_back();
+        rotTarget[i][0] = 0;
+        bu.emplace_back();
+        bu[i][0] = 0;
+    }
+
+    SoundPlayer::getInstance()->loadSound("hit.wav");
+    SoundPlayer::getInstance()->loadSound("shoot.wav");
+    SoundPlayer::getInstance()->loadSound("death.wav");
+    SoundPlayer::getInstance()->loadSound("shield.wav");
+
+    music.openFromFile("res/wild.wav");
+    music.setLoop(true);
+    music.setVolume(50);
+
+    font.loadFromFile("res/kenpixel_square.ttf");
+
+    s1.setFont(font);
+    s1.setSize(32);
+    s1.setColor(sf::Color(254,115,127));
+    s1.setCentered(true);
+    s2.setFont(font);
+    s2.setSize(32);
+    s2.setColor(sf::Color(127,192,2));
+    s2.setCentered(true);
+    mid.setFont(font);
+    mid.setSize(32);
+    mid.setColor(sf::Color(255,255,255));
+    mid.setCentered(true);
+    mid.setString(":");
+
+    sfxToName[0] = "hit.wav";
+    sfxToVol[0]  = 25;
+    sfxToName[1] = "shoot.wav";
+    sfxToVol[1]  = 60;
+    sfxToName[2] = "death.wav";
+    sfxToVol[2]  = 100;
+    sfxToName[3] = "shield.wav";
+    sfxToVol[3]  = 60;
+
+    shake = 0;
+
+    s1.setPosition(int(windowSize.x/2-32),10);
+    s2.setPosition(int(windowSize.x/2+32),10);
+    mid.setPosition(int(windowSize.x/2),10);
+
+    for (int i=0;i<2;i++) {
+        lastAngle[i] = 0;
+        score[i] = 0;
+    }
+
     gameSocket = new sf::UdpSocket();
     if (gameSocket->bind(0) != sf::Socket::Done)
     {
@@ -62,53 +135,7 @@ void Game::setupScene(sf::RenderWindow &window) {
     socket.send(p);
     gameSocket->setBlocking(false);
 
-    start();
-    view = window.getView();
-    view.zoom(1/Director::getInstance()->getScale());
-    view.setCenter(11.5*32,6.5*32);
-    view2 = view;
-    tileSheet = TextureLoader::getInstance()->getSprite("tiles.png");
-    tileSheet.setTextureRect(sf::IntRect(0, 64, 32, 32));
-
-    SoundPlayer::getInstance()->loadSound("hit.wav");
-    SoundPlayer::getInstance()->loadSound("shoot.wav");
-    SoundPlayer::getInstance()->loadSound("death.wav");
-    SoundPlayer::getInstance()->loadSound("shield.wav");
-
-    font.loadFromFile("res/kenpixel_square.ttf");
-
-    s1.setFont(font);
-    s1.setCharacterSize(32);
-    s1.setColor(sf::Color(254,115,127));
-    s2.setFont(font);
-    s2.setCharacterSize(32);
-    s2.setColor(sf::Color(127,192,2));
-    mid.setFont(font);
-    mid.setCharacterSize(32);
-    mid.setColor(sf::Color(255,255,255));
-    mid.setString(":");
-
-    sfxToName[0] = "hit.wav";
-    sfxToVol[0]  = 25;
-    sfxToName[1] = "shoot.wav";
-    sfxToVol[1]  = 60;
-    sfxToName[2] = "death.wav";
-    sfxToVol[2]  = 100;
-    sfxToName[3] = "shield.wav";
-    sfxToVol[3]  = 60;
-
-    shake = 0;
-
-    s1.setPosition(int(window.getView().getSize().x/2-32),10);
-    s2.setPosition(int(window.getView().getSize().x/2+32),10);
-    mid.setPosition(int(window.getView().getSize().x/2),10);
-    sf::FloatRect textRect = mid.getLocalBounds();
-    mid.setOrigin(int(textRect.left + textRect.width/2.0f),0);
-
-    for (int i=0;i<2;i++) {
-        lastAngle[i] = 0;
-        score[i] = 0;
-    }
+    //music.play();
 }
 
 void Game::start() {
@@ -182,19 +209,68 @@ void Game::draw(sf::RenderTarget *window,float alpha) {
 
     window->setView(window->getDefaultView());
 
-    if (std::to_string(int(score[0])) != s1.getString()) {
-        s1.setString(std::to_string(int(score[0])));
-        sf::FloatRect textRect = s1.getLocalBounds();
-        s1.setOrigin(int(textRect.left + textRect.width/2.0f),0);
+    s1.setString(std::to_string(int(score[0])));
+    s2.setString(std::to_string(int(score[1])));
+
+
+    s1.draw(*window);
+    s2.draw(*window);
+    mid.draw(*window);
+
+    for (int i=0;i<2;i++) {
+        int f = rotCurrent[i]%24;
+        gun[i].setTextureRect(sf::IntRect(f/6*54,54*2*i,54,54));
+        bullets.setTextureRect(sf::IntRect(32*2,32*2*i,32,32));
+        f/=6;
+        window->draw(gun[i]);
+        sf::Vector2f p = gun[i].getPosition();
+        for (size_t t=0;t<6;t++) {
+            if ((bu[i][tickCurrent] & (1<<t)) != 0) {
+                int c=t;
+                if (f==0) {
+                    if (rotTarget[i][tickCurrent] != rotCurrent[i]/24) {
+                        c--;
+                    }
+                }
+                int neg=1;
+                if (c>=3||c<0) {
+                    neg=-1;
+                }
+                if (c%3==0) {
+                    if (f==0) {
+                        bullets.setPosition(p+sf::Vector2f(0*neg,-16*neg));
+                    } else if (f==1) {
+                        bullets.setPosition(p+sf::Vector2f(-14*neg,-11*neg));
+                    } else if (f==2) {
+                        bullets.setPosition(p+sf::Vector2f(-9*neg,-14*neg));
+                    } else {
+                        bullets.setPosition(p+sf::Vector2f(-2*neg,-16*neg));
+                    }
+                } else if (c%3==1) {
+                    if (f==0) {
+                        bullets.setPosition(p+sf::Vector2f(15*neg,-9*neg));
+                    } else if (f==1) {
+                        bullets.setPosition(p+sf::Vector2f(2*neg,-16*neg));
+                    } else if (f==2) {
+                        bullets.setPosition(p+sf::Vector2f(8*neg,-14*neg));
+                    } else {
+                        bullets.setPosition(p+sf::Vector2f(14*neg,-11*neg));
+                    }
+                } else {
+                    if (f==0) {
+                        bullets.setPosition(p+sf::Vector2f(15*neg,9*neg));
+                    } else if (f==1) {
+                        bullets.setPosition(p+sf::Vector2f(16*neg,-7*neg));
+                    } else if (f==2) {
+                        bullets.setPosition(p+sf::Vector2f(16*neg,-0*neg));
+                    } else {
+                        bullets.setPosition(p+sf::Vector2f(16*neg,7*neg));
+                    }
+                }
+                window->draw(bullets);
+            }
+        }
     }
-    if (std::to_string(int(score[1])) != s2.getString()) {
-        s2.setString(std::to_string(int(score[1])));
-        sf::FloatRect textRect = s2.getLocalBounds();
-        s2.setOrigin(int(textRect.left + textRect.width/2.0f),0);
-    }
-    window->draw(s1);
-    window->draw(s2);
-    window->draw(mid);
 }
 
 void Game::handleEvent(sf::Event event, sf::RenderWindow *window) {
@@ -216,19 +292,25 @@ bool Game::tick(sf::RenderWindow *window) {
         packet>>player;
         sf::Uint32 last = tickTarget;
         packet>>tickTarget;
-        sf::Uint8 tS;
-        packet>>tS>>score[0]>>score[1];
-        if (tS > 0) {
-            shake = float(tS);
-        }
         if (tickTarget > last) {
 
             if (tickTarget-last > 2)
-            std::cout << "Dif:" << int(tickTarget-last) << "\n";
+                std::cout << "Dif:" << int(tickTarget-last) << "\n";
 
-            int i=0;
+            for (sf::Uint32 i=last;i<tickTarget;i++) {
+                for (int t=0;t<2;t++) {
+                    rotTarget[t][i] = rotTarget[t][last];
+                    bu[t][i] = bu[t][last];
+                }
+            }
+
+            sf::Uint8 tS;
+            packet>>tS>>score[0]>>score[1]>>rotTarget[0][tickTarget]>>rotTarget[1][tickTarget]>>bu[0][tickTarget]>>bu[1][tickTarget];
+            if (tS > 0) {
+                shake = float(tS);
+            }
+
             while (true) {
-                i++;
                 float x,y,angle;
                 sf::Uint16 num;
                 sf::Uint8 frame;
@@ -249,9 +331,10 @@ bool Game::tick(sf::RenderWindow *window) {
                             packet>>b->color;
                             actors[num] = b;
                         } else if (cNum == 2) {
-                            std::shared_ptr<Player> p = std::make_shared<Player>();
+                            sf::Uint8 col;
+                            packet>>col;
+                            std::shared_ptr<Player> p = std::make_shared<Player>(col);
                             players.push_back(p);
-                            packet>>p->color;
                             actors[num] = p;
                         } else {
                             actors[num] = std::make_shared<Actor>();
@@ -283,30 +366,44 @@ bool Game::tick(sf::RenderWindow *window) {
     }
     if (!wait) {
         if (diff >= 8) {
-            tickCurrent++;
+            logicUpdate();
             std::cout<<"QUICK\n";
         }
-        tickCurrent++;
-        for (size_t i=0;i<sfx[tickCurrent].size();i++) {
-            SoundPlayer::getInstance()->playSound(sfxToName[sfx[tickCurrent][i]],sfxToVol[sfx[tickCurrent][i]]);
-        }
-
-        view2.setCenter(view.getCenter());
-
-        if (shake > 0) {
-            int angle = rand()%360;
-            float x=cos(angle*M_PI/180)*shake;
-            float y=sin(angle*M_PI/180)*shake;
-            view2.move(x,y);
-            shake-=0.4;
-        } else {
-            shake = 0;
-        }
+        logicUpdate();
     }
 
     input(window);
 
     return true;
+}
+
+void Game::logicUpdate() {
+    tickCurrent++;
+
+    for (size_t i=0;i<sfx[tickCurrent].size();i++) {
+        SoundPlayer::getInstance()->playSound(sfxToName[sfx[tickCurrent][i]],sfxToVol[sfx[tickCurrent][i]]);
+    }
+
+    for (int i=0;i<2;i++) {
+        if (rotTarget[i][tickCurrent] != rotCurrent[i]/24) {
+            rotCurrent[i]++;
+            if (rotCurrent[i] == 24*6) {
+                rotCurrent[i] = 0;
+            }
+        }
+    }
+
+    view2.setCenter(view.getCenter());
+
+    if (shake > 0) {
+        int angle = rand()%360;
+        float x=cos(angle*M_PI/180)*shake;
+        float y=sin(angle*M_PI/180)*shake;
+        view2.move(x,y);
+        shake-=0.4;
+    } else {
+        shake = 0;
+    }
 }
 
 void Game::input(sf::RenderWindow *window) {

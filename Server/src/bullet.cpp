@@ -1,6 +1,7 @@
 #include "bullet.hpp"
 #include <memory>
 #include <cmath>
+#include <iostream>
 
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
@@ -13,10 +14,11 @@ void Bullet::collidedBy(std::shared_ptr<Actor> a) {
     a->collideWith(std::static_pointer_cast<Bullet>(shared_from_this()));
 }
 
-Bullet::Bullet(VECTOR2 p, float a, sf::Uint8 c) : Actor() {
+Bullet::Bullet(VECTOR2 p, float s, float a, sf::Uint8 c) : Actor() {
 	pos = p;
 	color = c;
-	velocity = VECTOR2(3.25,0)%a;
+    speed = s;
+	velocity = VECTOR2(speed,0)%a;
 	radius = 5;
 	anchor = 0;
 	Disk *d = new Disk();
@@ -25,10 +27,12 @@ Bullet::Bullet(VECTOR2 p, float a, sf::Uint8 c) : Actor() {
     classNum = 1;
     live = true;
     step = 0;
+    countdown = 0;
 }
 
 void Bullet::update() {
     Actor::update();
+    countdown--;
     if (live) {
     	frameTime++;
     	if (frameTime>6) {
@@ -88,18 +92,29 @@ void Bullet::send(sf::Packet& p) {
 
 void Bullet::collideWith(std::shared_ptr<Bullet> b) {
     if (live && b->live) {
-        VECTOR2 collision = pos-b->getPos();
-        double distance = collision.mag();
-        collision /= distance;
-        double aci = getVelocity().dot(collision);
+        if (last != b || countdown <= 0) {
+            VECTOR2 collision = pos-b->getPos();
+            double distance = collision.mag();
+            collision /= distance;
+            double aci = getVelocity().dot(collision);
 
-        double bci = b->getVelocity().dot(collision);
+            double bci = b->getVelocity().dot(collision);
 
-        double acf = bci;
-        double bcf = aci;
+            double acf = bci;
+            double bcf = aci;
 
-        setVelocity(getVelocity()+collision*(acf-aci));
-        b->setVelocity(b->getVelocity()+collision*(bcf-bci));
-        sfx.push_back(0);
+            VECTOR2 t1 = getVelocity()+collision*(acf-aci);
+            t1.reassign(t1.norm() * speed);
+            setVelocity(t1);
+
+            VECTOR2 t2 = b->getVelocity()+collision*(bcf-bci);
+            t2.reassign(t2.norm() * b->speed);
+            b->setVelocity(t2);
+
+            sfx.push_back(0);
+
+            last = b;
+            countdown = 12;
+        }
     }
 }

@@ -11,9 +11,15 @@ class Player : public Actor {
     PlayerState* state_;
     float accel,deccel,maxVel;
     bool splat;
+    bool facingRight;
 public:
+    std::vector<int> bag;
+
     int shotTime,shield,bulletCount;
+    sf::Uint8 rotTarget;
     sf::Uint8 color;
+    sf::Uint8 bu;
+    bool b[6];
 
     Player(sf::Uint8);
     ~Player();
@@ -21,6 +27,10 @@ public:
     float getAccel();
     float getDeccel();
     float getMaxVel();
+
+    int getRandom();
+
+    void shift();
 
     virtual void newState(PlayerState* state);
 

@@ -3,6 +3,7 @@
 #include "game.hpp"
 #include "bullet.hpp"
 #include <iostream>
+#include <cmath>
 
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
@@ -26,15 +27,15 @@ PlayerState* WalkState::update(Player& player) {
 	VECTOR2 vel = player.getVelocity();
 	player.setPos(player.getPos()+vel);
 	float mag = vel.mag();
-	player.frameTime++;
-	if (player.frameTime > 6) {
-		player.frameTime = 0;
-		player.frame++;
-	}
 	if (mag != 0) {
 		if (stopped == true) {
 			player.frameTime = 0;
-			player.frame = 0;
+			player.frame = 4;
+		}
+		player.frameTime++;
+		if (player.frameTime > 6) {
+			player.frameTime = 0;
+			player.frame++;
 		}
 		if (player.frame > 7) {
 			player.frame = 4;
@@ -49,7 +50,12 @@ PlayerState* WalkState::update(Player& player) {
 	} else {
 		if (stopped == false) {
 			player.frameTime = 0;
-			player.frame = 4;
+			player.frame = 0;
+		}
+		player.frameTime++;
+		if (player.frameTime > 8) {
+			player.frameTime = 0;
+			player.frame++;
 		}
 		if (player.frame > 3) {
 			player.frame = 0;
@@ -71,27 +77,65 @@ PlayerState* WalkState::handleInput(Player& player, Input input) {
 
 	if (player.shotTime <= 0) {
 		if (input.s && player.bulletCount > 0) {
-			player.sfx.push_back(1);
-			player.game->setShake(5);
-			VECTOR2 hand(12,0);
+			VECTOR2 hand(15,0);
 			hand%=input.angle;
-			player.game->makeActor(std::make_shared<Bullet>(player.getPos()+hand,input.angle,player.color));
+			float speed = 3.25;
+			if (player.getRandom() != 0) {
+				speed = 5.25;
+				player.sfx.push_back(2);
+				player.game->setShake(10);
+			} else {
+				player.sfx.push_back(1);
+				player.game->setShake(5);
+			}
+			player.game->makeActor(std::make_shared<Bullet>(player.getPos()+hand,speed,input.angle,player.color));
 			player.shotTime = 40;
             player.bulletCount--;
+            player.rotTarget++;
+            player.b[0] = false;
+            player.shift();
+            if (player.rotTarget == 6) {
+            	player.rotTarget = 0;
+            }
 		}
 	}
 
 	if (input.sh) {
-		return new ShieldState();
+		if (i.x == 0 && i.y == 0) {
+			return new ShieldState();
+		} else {
+			player.setVelocity(VECTOR2(player.getMaxVel(),0)%std::atan2(i.y,i.x));
+			return new RollState();
+		}
 	}
 
+	return nullptr;
+}
+
+void RollState::enter(Player& player) {
+	player.frame=8;
+	player.frameTime = 0;
+}
+
+PlayerState* RollState::update(Player& player) {
+	VECTOR2 vel = player.getVelocity();
+	player.setPos(player.getPos()+vel);
+	player.frameTime++;
+	if (player.frameTime >= 6) {
+		player.frameTime = 0;
+		player.frame++;
+	}
+	if (player.frame > 11) {
+		return new WalkState();
+	}
+	player.shotTime--;
 	return nullptr;
 }
 
 void ShieldState::enter(Player& player) {
 	player.sfx.push_back(3);
 	player.setVelocity(VECTOR2(0,0));
-	player.frame=8;
+	player.frame=12;
 	player.frameTime = 0;
 	time = 40;
 }
@@ -102,7 +146,7 @@ PlayerState* ShieldState::update(Player& player) {
 		player.frameTime = 0;
 		player.frame++;
 	}
-	if (player.frame > 12) {
+	if (player.frame > 15) {
 		player.frame = 0;
 		player.frameTime = -100;
 	}

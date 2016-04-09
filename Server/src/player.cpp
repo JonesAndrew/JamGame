@@ -14,7 +14,7 @@ Player::Player(sf::Uint8 c) : Actor() {
     anchor = 0;
     frame = 0;
     radius = 15;
-    color = c*2;
+    color = c*2+1;
     state_ = nullptr;
     // Disk *d = new Disk();
     // d->radius = radius;
@@ -32,10 +32,42 @@ Player::Player(sf::Uint8 c) : Actor() {
     deccel = 0.15;
     classNum = 2;
 
+    rotTarget = 0;
+
     res();
 }
 
+int Player::getRandom() {
+    if (bag.size() == 0) {
+        for (int i=0;i<7;i++) {
+            bag.push_back(0);
+        }
+        bag.push_back(1);
+    }
+
+    int r=rand()%bag.size();
+    int value = bag[r];
+    if (value != 0) {
+        bag.erase(bag.begin()+r);
+        //bag.clear();
+    } else {
+        bag.erase(bag.begin()+r);
+    }
+    return value;
+}
+
+void Player::shift() {
+    bool copy=b[5];
+    for (int i=1;i<6;i++) {
+        b[6-i]=b[5-i];
+    }
+    b[0]=copy;
+}
+
 void Player::res() {
+    for (int i=0;i<6;i++) {
+        b[i] = true;
+    }
     bulletCount = 6;
     shotTime = 0;
     velocity = VECTOR2(0,0);
@@ -84,13 +116,28 @@ void Player::update()
     if (!dead) {
         newState(state_->update(*this));
     }
+    if (velocity.x > 0) {
+        facingRight = true;
+    } else if (velocity.x < 0) {
+        facingRight = false;
+    }
+    bu = 0;
+    for (size_t t=0;t<6;t++) {
+        if (b[t]) {
+            bu += (1<<t);
+        }
+    }
 }
 
 sf::Uint8 Player::getFrame() {
+    sf::Uint8 f=frame;
     if (shotTime > 44) {
-        return frame+20;
+        f+=20;
     }
-    return frame;
+    if (facingRight) {
+        f+=100;
+    }
+    return f;
 }
 
 void Player::collideWith(std::shared_ptr<Actor> a) {
@@ -100,31 +147,41 @@ void Player::collidedBy(std::shared_ptr<Actor> a) {
     a->collideWith(std::static_pointer_cast<Player>(shared_from_this()));
 }
 
-void Player::collideWith(std::shared_ptr<Bullet> b) {
-    if (!splat) {
-        if (b->time > 8 && b->live) {
+void Player::collideWith(std::shared_ptr<Bullet> bul) {
+    if (!splat && (frame < 8 || frame >= 12)) {
+        if (bul->time > 8 && bul->live) {
             if (frame < 8) {
                 newState(new DeadState());
                 game->setRestartTime(60);
                 game->addPoint(1-(color/2));
                 sfx.push_back(2);
                 game->setShake(10);
-                b->setDead(true);
+                bul->setDead(true);
                 splat = true;
             } else {
-                b->live = false;
-                if (b->getPos().x > pos.x) {
-                    b->setVelocity(VECTOR2(0.5,-3));
-                    b->setAngle(180);
+                bul->live = false;
+                if (bul->getPos().x > pos.x) {
+                    bul->setVelocity(VECTOR2(0.5,-3));
+                    bul->setAngle(180);
                 } else {
-                    b->setVelocity(VECTOR2(-0.5,-3));
-                    b->setAngle(0);
+                    bul->setVelocity(VECTOR2(-0.5,-3));
+                    bul->setAngle(0);
                 }
             }
             game->setShake(5);
-        } else if (b->step == 2 && bulletCount < 6) {
-            b->setDead(true);
+        } else if (bul->step == 2 && bulletCount < 6) {
+            bul->setDead(true);
             bulletCount++;
+            if(!b[0]) {
+                b[0] = true;
+            } else {
+                for (int i=1;i<6;i++) {
+                    if(!b[6-i]) {
+                        b[6-i] = true;
+                        break;
+                    }
+                }
+            }
         }
     }
 }

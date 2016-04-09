@@ -10,7 +10,7 @@ SoundPlayer *SoundPlayer::getInstance() {
 }
 
 void SoundPlayer::playSound(std::string file,int vol) {
-    for (int i=0; i<sfx.size(); i++) {
+    for (size_t i=0; i<sfx.size(); i++) {
         if (sfx[i].getStatus() == sf::Sound::Stopped) {
             sfx.erase(sfx.begin()+i);
             i--;
@@ -26,10 +26,21 @@ void SoundPlayer::playSound(std::string file,int vol) {
         sounds[file] = s;
     }
 
-    sfx.emplace_back();
-    sfx.back().setBuffer(s->s);
-    sfx.back().setVolume(vol);
-    sfx.back().play();
+    bool copy=false;
+    for (size_t i=0;i<sfx.size();i++) {
+        if (sfx[i].getBuffer() == &s->s) {
+            //sfx[i].play();
+            //copy = true;
+            break;
+        }
+    }
+
+    if (!copy) {
+        sfx.emplace_back();
+        sfx.back().setBuffer(s->s);
+        sfx.back().setVolume(vol);
+        sfx.back().play();
+    }
 }
 
 void SoundPlayer::loadSound(std::string file) {

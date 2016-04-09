@@ -97,7 +97,8 @@ void Game::update() {
         sf::Packet packet;
         sf::Uint16 t=0;
 
-        packet<<tick<<shake<<score[0]<<score[1];
+        packet<<tick<<shake<<score[0]<<score[1]<<gamePlayers[0]->rotTarget<<gamePlayers[1]->rotTarget
+              <<gamePlayers[0]->bu<<gamePlayers[1]->bu;
 
         shake = 0;
 

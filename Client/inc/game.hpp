@@ -19,16 +19,24 @@ class Label {
     sf::Text text;
 
     bool center;
-private:
+public:
+    void setFont(sf::Font &font) {
+        text.setFont(font);
+    }
+
     void setCentered(bool c) {
         center = c;
     }
 
-    void setText(std::string set) {
+    void setString(std::string set) {
         if (text.getString() != set) {
             text.setString(set);
             pos();
         }
+    }
+
+    void setSize(int size) {
+        text.setCharacterSize(size);
     }
 
     void pos() {
@@ -38,15 +46,25 @@ private:
         }
     }
 
-    void setPos(int x, int y) {
+    void setPosition(int x, int y) {
         text.setPosition(x,y);
+    }
+
+    void setColor(sf::Color c) {
+        text.setColor(c);
+    }
+
+    void draw(sf::RenderTarget &window) {
+        window.draw(text);
     }
 };
 
 class Game : public Scene {
-    std::map<sf::Uint16,std::shared_ptr<Actor> > actors;
+    std::map<sf::Uint32,std::shared_ptr<Actor> > actors;
     std::vector<std::shared_ptr<Player>> players;
-    std::map<sf::Uint16,std::vector<sf::Uint8> > sfx;
+    std::map<sf::Uint32,std::vector<sf::Uint8> > sfx;
+    std::vector<std::map<sf::Uint32,sf::Uint8> > rotTarget;
+    std::vector<std::map<sf::Uint32,sf::Uint8> > bu;
     std::map<sf::Uint8,std::string> sfxToName;
     std::map<sf::Uint8,int> sfxToVol;
 
@@ -62,9 +80,11 @@ class Game : public Scene {
     sf::Uint32 tickCurrent;
     sf::Uint32 tickTarget;
 
+    sf::Music music;
+
     sf::Font font;
 
-    sf::Text s1,s2,mid;
+    Label s1,s2,mid;
 
     sf::Uint16 player;
 
@@ -72,7 +92,15 @@ class Game : public Scene {
 
     sf::View view;
     sf::View view2;
+
+    sf::Vector2f windowSize;
+
     sf::Sprite tileSheet;
+
+    sf::Sprite gun[2];
+    sf::Sprite bullets;
+
+    sf::Uint8 rotCurrent[2];
 public:
     void start();
     void input(sf::RenderWindow *window);
@@ -80,6 +108,7 @@ public:
     virtual void setupScene(sf::RenderWindow &window);
     virtual bool tick(sf::RenderWindow *window);
     virtual void handleEvent(sf::Event event, sf::RenderWindow *window);
+    virtual void logicUpdate();
     ~Game();
 };
 
