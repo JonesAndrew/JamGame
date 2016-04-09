@@ -14,6 +14,8 @@ PlayerState* PlayerState::handleInput(Player& player, Input input) {
 }
 
 PlayerState* PlayerState::update(Player& player) {
+	player.shotTime--;
+	player.dodgeTime--;
     return nullptr;
 }
 
@@ -24,6 +26,7 @@ void WalkState::enter(Player& player) {
 }
 
 PlayerState* WalkState::update(Player& player) {
+	PlayerState::update(player);
 	VECTOR2 vel = player.getVelocity();
 	player.setPos(player.getPos()+vel);
 	float mag = vel.mag();
@@ -62,7 +65,6 @@ PlayerState* WalkState::update(Player& player) {
 		}
 		stopped = true;
 	}
-	player.shotTime--;
 	return nullptr;
 }
 
@@ -103,7 +105,8 @@ PlayerState* WalkState::handleInput(Player& player, Input input) {
 	if (input.sh) {
 		if (i.x == 0 && i.y == 0) {
 			return new ShieldState();
-		} else {
+		} else if (player.dodgeTime <= 0) {
+			player.dodgeTime = 40;
 			player.setVelocity(VECTOR2(player.getMaxVel(),0)%std::atan2(i.y,i.x));
 			return new RollState();
 		}
@@ -118,6 +121,7 @@ void RollState::enter(Player& player) {
 }
 
 PlayerState* RollState::update(Player& player) {
+	PlayerState::update(player);
 	VECTOR2 vel = player.getVelocity();
 	player.setPos(player.getPos()+vel);
 	player.frameTime++;
@@ -128,7 +132,6 @@ PlayerState* RollState::update(Player& player) {
 	if (player.frame > 11) {
 		return new WalkState();
 	}
-	player.shotTime--;
 	return nullptr;
 }
 
@@ -141,6 +144,7 @@ void ShieldState::enter(Player& player) {
 }
 
 PlayerState* ShieldState::update(Player& player) {
+	PlayerState::update(player);
 	player.frameTime++;
 	if (player.frameTime >= 6) {
 		player.frameTime = 0;
@@ -150,7 +154,6 @@ PlayerState* ShieldState::update(Player& player) {
 		player.frame = 0;
 		player.frameTime = -100;
 	}
-	player.shotTime--;
 	time--;
 	if (time == 0) {
 		return new WalkState();
@@ -165,6 +168,7 @@ void DeadState::enter(Player& player) {
 }
 
 PlayerState* DeadState::update(Player& player) {
+	PlayerState::update(player);
 	player.frameTime++;
 	if (player.frameTime >= 6) {
 		player.frameTime = 0;

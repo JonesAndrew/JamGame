@@ -15,7 +15,7 @@ class Player : public Actor {
 public:
     std::vector<int> bag;
 
-    int shotTime,shield,bulletCount;
+    int shotTime,shield,bulletCount,dodgeTime;
     sf::Uint8 rotTarget;
     sf::Uint8 color;
     sf::Uint8 bu;

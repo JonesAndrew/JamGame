@@ -14,7 +14,7 @@ Player::Player(sf::Uint8 c) : Actor() {
     anchor = 0;
     frame = 0;
     radius = 15;
-    color = c*2+1;
+    color = c*2;
     state_ = nullptr;
     // Disk *d = new Disk();
     // d->radius = radius;
@@ -35,6 +35,19 @@ Player::Player(sf::Uint8 c) : Actor() {
     rotTarget = 0;
 
     res();
+}
+
+void Player::res() {
+    for (int i=0;i<6;i++) {
+        b[i] = true;
+    }
+    bulletCount = 6;
+    shotTime = 0;
+    velocity = VECTOR2(0,0);
+    dead = false;
+    splat = false;
+    dodgeTime = 0;
+    newState(new WalkState());
 }
 
 int Player::getRandom() {
@@ -62,18 +75,6 @@ void Player::shift() {
         b[6-i]=b[5-i];
     }
     b[0]=copy;
-}
-
-void Player::res() {
-    for (int i=0;i<6;i++) {
-        b[i] = true;
-    }
-    bulletCount = 6;
-    shotTime = 0;
-    velocity = VECTOR2(0,0);
-    dead = false;
-    splat = false;
-    newState(new WalkState());
 }
 
 float Player::getAccel() {
