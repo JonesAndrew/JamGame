@@ -14,7 +14,7 @@ Player::Player(sf::Uint8 c) : Actor() {
     anchor = 0;
     frame = 0;
     radius = 15;
-    color = c*2;
+    color = c;
     state_ = nullptr;
     // Disk *d = new Disk();
     // d->radius = radius;
@@ -157,10 +157,10 @@ void Player::collidedBy(std::shared_ptr<Actor> a) {
 void Player::collideWith(std::shared_ptr<Bullet> bul) {
     if (!splat) {
         if (bul->time > 8 && bul->live) {
-            if (frame < 8) {
+            if (frame < 8 && bul->color != color) {
                 newState(new DeadState());
-                game->setRestartTime(60);
-                game->addPoint(1-(color/2));
+                // game->setRestartTime(60);
+                // game->addPoint(1-(color/2));
                 sfx.push_back(2);
                 game->setShake(10);
                 bul->setDead(true);
@@ -174,8 +174,8 @@ void Player::collideWith(std::shared_ptr<Bullet> bul) {
                     bul->setVelocity(VECTOR2(-0.5,-3));
                     bul->setAngle(0);
                 }
+                game->setShake(5);
             }
-            game->setShake(5);
         } else if (bul->step == 2 && bulletCount < 6) {
             bul->setDead(true);
             bulletCount++;

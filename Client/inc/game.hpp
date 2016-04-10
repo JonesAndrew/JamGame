@@ -77,7 +77,7 @@ class Game : public Scene {
 
     float shake;
 
-    float lastAngle[2];
+    float lastAngle[4];
 
     sf::Uint32 tickCurrent;
     sf::Uint32 tickTarget;
@@ -86,23 +86,23 @@ class Game : public Scene {
 
     sf::Font font;
 
-    Label s1,s2,mid;
+    Label sL[4];
 
     sf::Uint16 player;
 
-    sf::Uint8 score[2];
+    sf::Uint8 score[4];
 
     sf::View view;
-    sf::View view2;
 
+    sf::View view2;
     sf::Vector2f windowSize;
 
     sf::Sprite tileSheet;
 
-    sf::Sprite gun[2];
+    sf::Sprite gun[4];
     sf::Sprite bullets;
 
-    sf::Uint8 rotCurrent[2];
+    sf::Uint8 rotCurrent[4];
 public:
     void start();
     void input(sf::RenderWindow *window);

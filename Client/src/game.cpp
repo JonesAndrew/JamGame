@@ -17,7 +17,7 @@
 // #include "ResourcePath.hpp"
 #endif
 
-#define PLAYERS 2
+#define PLAYERS 4
 
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
@@ -46,11 +46,16 @@ void Game::setupScene(sf::RenderWindow &window) {
     bullets.setOrigin(16,16);
     bullets.setPosition(windowSize.x/2-96,windowSize.y-47);
 
-    for (int i=0;i<2;i++) {
+    for (int i=0;i<4;i++) {
         gun[i] = TextureLoader::getInstance()->getSprite("gunsUi.png");
-        gun[i].setTextureRect(sf::IntRect(0,54*2*i,54,54));
+        gun[i].setTextureRect(sf::IntRect(0,54*i,54,54));
         gun[i].setOrigin(27,27);
-        gun[i].setPosition(windowSize.x/2-96+(96*2*i),windowSize.y-47);
+        gun[i].setPosition(windowSize.x/2-96-96-96+(96*2*i),windowSize.y-47);
+    }
+
+    for (int i=0;i<4;i++) {
+        lastAngle[i] = 0;
+        score[i] = 0;
         rotCurrent[i] = 0;
         rotTarget.emplace_back();
         rotTarget[i][0] = 0;
@@ -69,19 +74,17 @@ void Game::setupScene(sf::RenderWindow &window) {
 
     font.loadFromFile("res/kenpixel_square.ttf");
 
-    s1.setFont(font);
-    s1.setSize(32);
-    s1.setColor(sf::Color(254,115,127));
-    s1.setCentered(true);
-    s2.setFont(font);
-    s2.setSize(32);
-    s2.setColor(sf::Color(127,192,2));
-    s2.setCentered(true);
-    mid.setFont(font);
-    mid.setSize(32);
-    mid.setColor(sf::Color(255,255,255));
-    mid.setCentered(true);
-    mid.setString(":");
+    for (int i=0;i<4;i++) {
+        sL[i].setFont(font);
+        sL[i].setSize(32);
+        sL[i].setCentered(true);
+        sL[i].setPosition(int(windowSize.x/2)-96+(64*i),10);
+    }
+
+    sL[0].setColor(sf::Color(254,115,127));
+    sL[1].setColor(sf::Color(221,102,20));
+    sL[2].setColor(sf::Color(127,192,2));
+    sL[3].setColor(sf::Color(140,151,255));
 
     sfxToName[0] = "hit.wav";
     sfxToVol[0]  = 25;
@@ -93,10 +96,6 @@ void Game::setupScene(sf::RenderWindow &window) {
     sfxToVol[3]  = 60;
 
     shake = 0;
-
-    s1.setPosition(int(windowSize.x/2-32),10);
-    s2.setPosition(int(windowSize.x/2+32),10);
-    mid.setPosition(int(windowSize.x/2),10);
 
     int sizeX=23;
     int sizeY=13;
@@ -139,17 +138,12 @@ void Game::setupScene(sf::RenderWindow &window) {
     tiles[21][6] = 11;
     tiles[20][6] = 14;
 
-    for (int i=0;i<2;i++) {
-        lastAngle[i] = 0;
-        score[i] = 0;
-    }
-
     gameSocket = new sf::UdpSocket();
     if (gameSocket->bind(0) != sf::Socket::Done)
     {
         // error...
     }
-    if (PLAYERS == 2) {
+    if (PLAYERS == 4) {
         server = "127.0.0.1";
     } else {
         server = "104.236.122.65";
@@ -230,18 +224,15 @@ void Game::draw(sf::RenderTarget *window,float alpha) {
 
     window->setView(window->getDefaultView());
 
-    s1.setString(std::to_string(int(score[0])));
-    s2.setString(std::to_string(int(score[1])));
+    for (int i=0;i<4;i++) {
+        sL[i].setString(std::to_string(int(score[i])));
+        sL[i].draw(*window);
+    }
 
-
-    s1.draw(*window);
-    s2.draw(*window);
-    mid.draw(*window);
-
-    for (int i=0;i<2;i++) {
+    for (int i=0;i<4;i++) {
         int f = rotCurrent[i]%24;
-        gun[i].setTextureRect(sf::IntRect(f/6*54,54*2*i,54,54));
-        bullets.setTextureRect(sf::IntRect(32*2,32*2*i,32,32));
+        gun[i].setTextureRect(sf::IntRect(f/6*54,54*i,54,54));
+        bullets.setTextureRect(sf::IntRect(32*2,32*i,32,32));
         f/=6;
         window->draw(gun[i]);
         sf::Vector2f p = gun[i].getPosition();
@@ -319,14 +310,18 @@ bool Game::tick(sf::RenderWindow *window) {
                 std::cout << "Dif:" << int(tickTarget-last) << "\n";
 
             for (sf::Uint32 i=last;i<tickTarget;i++) {
-                for (int t=0;t<2;t++) {
+                for (int t=0;t<4;t++) {
                     rotTarget[t][i] = rotTarget[t][last];
                     bu[t][i] = bu[t][last];
                 }
             }
 
             sf::Uint8 tS;
-            packet>>tS>>score[0]>>score[1]>>rotTarget[0][tickTarget]>>rotTarget[1][tickTarget]>>bu[0][tickTarget]>>bu[1][tickTarget];
+            packet>>tS>>score[0]>>score[1]>>score[2]>>score[3]
+                  >>rotTarget[0][tickTarget]>>rotTarget[1][tickTarget]
+                  >>rotTarget[2][tickTarget]>>rotTarget[3][tickTarget]
+                  >>bu[0][tickTarget]>>bu[1][tickTarget]
+                  >>bu[2][tickTarget]>>bu[3][tickTarget];
             if (tS > 0) {
                 shake = float(tS);
             }
@@ -405,7 +400,7 @@ void Game::logicUpdate() {
         SoundPlayer::getInstance()->playSound(sfxToName[sfx[tickCurrent][i]],sfxToVol[sfx[tickCurrent][i]]);
     }
 
-    for (int i=0;i<2;i++) {
+    for (int i=0;i<4;i++) {
         if (rotTarget[i][tickCurrent] != rotCurrent[i]/24) {
             rotCurrent[i]++;
             if (rotCurrent[i] == 24*6) {

@@ -62,6 +62,9 @@ Player::Player(sf::Uint8 c) {
         sprite = TextureLoader::getInstance()->getSprite("blue.png");
     }
 
+    orb = TextureLoader::getInstance()->getSprite("orb.png");
+    orb.setOrigin(30,30);
+
     gun = TextureLoader::getInstance()->getSprite("guns.png");
 
     sprite.setTextureRect(sf::IntRect(0, 0, 42, 42));
@@ -92,7 +95,7 @@ void Player::draw(sf::RenderTarget &window) {
     } else {
         sprite.setScale(1,1);
     }
-    
+
     sprite.setTextureRect(sf::IntRect((f%4)*42, (f/4)*42, 42, 42));
     sprite.setPosition(pos);
 
@@ -104,6 +107,12 @@ void Player::draw(sf::RenderTarget &window) {
 
     if (angle < 0) {
         window.draw(gun);
+    }
+
+    if (f >= 16) {
+        orb.setTextureRect(sf::IntRect((f-16)*60,0,60,60));
+        orb.setPosition(pos);
+        window.draw(orb);
     }
 
     window.draw(sprite);

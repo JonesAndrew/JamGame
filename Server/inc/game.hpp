@@ -13,7 +13,7 @@ protected:
     int gameNum;
     int w,h;
     int restartTime;
-    sf::Uint8 score[2];
+    sf::Uint8 score[4];
     sf::Uint8 shake;
     sf::Uint32 tick;
     sf::Uint16 actorCount;

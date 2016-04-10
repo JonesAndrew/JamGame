@@ -223,7 +223,7 @@ void tcpLoop() {
 
                 } else if (gameT == gameType::MULTIPLAYER_GAME) {
 
-                    if (numP == 2) {
+                    if (numP == 4) {
 
                         std::vector<std::weak_ptr<PlayerNetwork> > p;
                         p.push_back(players[i]);
@@ -233,7 +233,7 @@ void tcpLoop() {
 
                         que.push_back(players[i]);
 
-                        if (que.size() == 2) {
+                        if (que.size() == 4) {
                             startGame(que);
                             que.clear();
                         }

@@ -28,9 +28,9 @@ void Game::start() {
     makeActor(std::make_shared<Wall>(VECTOR2(16+1*32,12+(sizeY-1)/2*32),VECTOR2(32*3,24)));
     makeActor(std::make_shared<Wall>(VECTOR2(16+(sizeX-2)*32,12+(sizeY-1)/2*32),VECTOR2(32*3,24)));
 
-    for (int i=0; i<2; i++) {
+    for (int i=0; i<4; i++) {
         gamePlayers.push_back(std::make_shared<Player>(i));
-        gamePlayers.back()->setPos(VECTOR2(32+32*(sizeX-2)*i,32+32*(sizeY-2)*i));
+        gamePlayers.back()->setPos(VECTOR2(32+32*(sizeX-2)*(i%2),32+32*(sizeY-2)*(i/2)));
         makeActor(gamePlayers.back());
         score[i] = 0;
     }
@@ -67,19 +67,39 @@ void Game::update() {
 
     restartTime--;
     if (restartTime == 0) {
-        if (actors.size() > 10) {
-            actors.erase(actors.begin()+10,actors.end());
+        if (actors.size() > 12) {
+            actors.erase(actors.begin()+12,actors.end());
         }
-        for (int i=0; i<2; i++) {
+        for (int i=0; i<4; i++) {
             int sizeX = 23;
             int sizeY = 13;
             gamePlayers[i]->res();
-            gamePlayers[i]->setPos(VECTOR2(32+32*(sizeX-2)*i,32+32*(sizeY-2)*i));
+            gamePlayers[i]->setPos(VECTOR2(32+32*(sizeX-2)*(i%2),32+32*(sizeY-2)*(i/2)));
         }
     }
 
     for (int i=actors.size()-1;i>=0;i--) {
         actors[i]->update();
+    }
+
+    count=0;
+    int alive=0;
+    int last=0;
+    for (auto &p : players) {
+        for (int t=0;t<p->numberOfPlayers;t++) {
+            if (!gamePlayers[count]->splat) {
+                alive++;
+                last = count;
+            }
+            count++;
+        }
+    }
+
+    if (alive <= 1) {
+        if (restartTime < 0) {
+            restartTime = 60;
+            score[last]++;
+        }
     }
 
     for (size_t i=0;i<actors.size();i++) {
@@ -101,8 +121,11 @@ void Game::update() {
         sf::Packet packet;
         sf::Uint16 t=0;
 
-        packet<<tick<<shake<<score[0]<<score[1]<<gamePlayers[0]->rotTarget<<gamePlayers[1]->rotTarget
-              <<gamePlayers[0]->bu<<gamePlayers[1]->bu;
+        packet<<tick<<shake<<score[0]<<score[1]<<score[2]<<score[3]
+              <<gamePlayers[0]->rotTarget<<gamePlayers[1]->rotTarget
+              <<gamePlayers[2]->rotTarget<<gamePlayers[3]->rotTarget
+              <<gamePlayers[0]->bu<<gamePlayers[1]->bu
+              <<gamePlayers[2]->bu<<gamePlayers[3]->bu;
 
         shake = 0;
 

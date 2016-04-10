@@ -138,7 +138,7 @@ PlayerState* RollState::update(Player& player) {
 void ShieldState::enter(Player& player) {
 	player.sfx.push_back(3);
 	player.setVelocity(VECTOR2(0,0));
-	player.frame=12;
+	player.frame=16;
 	player.frameTime = 0;
 	time = 40;
     player.shape = player.sPol;
@@ -151,7 +151,7 @@ PlayerState* ShieldState::update(Player& player) {
 		player.frameTime = 0;
 		player.frame++;
 	}
-	if (player.frame > 15) {
+	if (player.frame > 19) {
 		player.frame = 0;
 		player.frameTime = -100;
 	}
@@ -164,7 +164,7 @@ PlayerState* ShieldState::update(Player& player) {
 
 void DeadState::enter(Player& player) {
 	player.setVelocity(VECTOR2(0,0));
-	player.frame=13;
+	player.frame=12;
 	player.frameTime = 0;
 }
 
@@ -175,8 +175,8 @@ PlayerState* DeadState::update(Player& player) {
 		player.frameTime = 0;
 		player.frame++;
 	}
-	if (player.frame > 17) {
-		player.frame = 17;
+	if (player.frame > 15) {
+		player.frame = 15;
 	}
 	return nullptr;
 }

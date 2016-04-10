@@ -38,7 +38,7 @@ struct Actor {
 
 struct Player : public Actor {
     Player(sf::Uint8 c);
-    sf::Sprite sprite,gun;
+    sf::Sprite sprite,gun,orb;
     sf::Uint8 color;
     virtual void draw(sf::RenderTarget &window);
 };
