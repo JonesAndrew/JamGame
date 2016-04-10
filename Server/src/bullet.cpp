@@ -28,6 +28,9 @@ Bullet::Bullet(VECTOR2 p, float s, float a, sf::Uint8 c) : Actor() {
     live = true;
     step = 0;
     countdown = 0;
+    if (speed >= 5.4) {
+        countdown = 300;
+    }
 }
 
 void Bullet::update() {
@@ -92,29 +95,52 @@ void Bullet::send(sf::Packet& p) {
 
 void Bullet::collideWith(std::shared_ptr<Bullet> b) {
     if (live && b->live) {
-        if (last != b || countdown <= 0) {
-            VECTOR2 collision = pos-b->getPos();
-            double distance = collision.mag();
-            collision /= distance;
-            double aci = getVelocity().dot(collision);
+        // if (last != b || countdown <= 0) {
+        //     VECTOR2 collision = pos-b->getPos();
+        //     double distance = collision.mag();
+        //     collision /= distance;
+        //     double aci = getVelocity().dot(collision);
 
-            double bci = b->getVelocity().dot(collision);
+        //     double bci = b->getVelocity().dot(collision);
 
-            double acf = bci;
-            double bcf = aci;
+        //     double acf = bci;
+        //     double bcf = aci;
 
-            VECTOR2 t1 = getVelocity()+collision*(acf-aci);
-            t1.reassign(t1.norm() * speed);
-            setVelocity(t1);
+        //     VECTOR2 t1 = getVelocity()+collision*(acf-aci);
+        //     t1.reassign(t1.norm() * speed);
+        //     setVelocity(t1);
 
-            VECTOR2 t2 = b->getVelocity()+collision*(bcf-bci);
-            t2.reassign(t2.norm() * b->speed);
-            b->setVelocity(t2);
+        //     VECTOR2 t2 = b->getVelocity()+collision*(bcf-bci);
+        //     t2.reassign(t2.norm() * b->speed);
+        //     b->setVelocity(t2);
 
-            sfx.push_back(0);
+        //     sfx.push_back(0);
 
-            last = b;
-            countdown = 12;
+        //     last = b;
+        //     countdown = 12;
+        // }
+        if (b->getPos().x > pos.x) {
+            if (b->countdown <= 0) {
+                b->setVelocity(VECTOR2(0.5,-3));
+                b->setAngle(180);
+                b->live = false;
+            }
+            if (countdown <= 0) {
+                setVelocity(VECTOR2(-0.5,-3));
+                setAngle(0);
+                live = false;
+            }
+        } else {
+            if (b->countdown <= 0) {
+                b->setVelocity(VECTOR2(-0.5,-3));
+                b->setAngle(0);
+                b->live = false;
+            }
+            if (countdown <= 0) {
+                setVelocity(VECTOR2(0.5,-3));
+                setAngle(180);
+                live = false;
+            }
         }
     }
 }

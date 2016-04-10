@@ -28,6 +28,7 @@ public:
 class RollState : public PlayerState {
 public:
 	virtual void enter(Player& player);
+	virtual PlayerState* handleInput(Player& player, Input input);
 	virtual PlayerState* update(Player& player);
 };
 

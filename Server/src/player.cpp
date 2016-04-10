@@ -53,6 +53,7 @@ void Player::res() {
     dead = false;
     splat = false;
     dodgeTime = 0;
+    charge = 0;
     newState(new WalkState());
 }
 

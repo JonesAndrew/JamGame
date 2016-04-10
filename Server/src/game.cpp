@@ -22,7 +22,11 @@ void Game::start() {
     makeActor(std::make_shared<Wall>(VECTOR2((sizeX+1)/2*32,(sizeY-1)*32+10),VECTOR2(sizeX*32,20)));
     makeActor(std::make_shared<Wall>(VECTOR2(22 ,(sizeY+1)/2*32),VECTOR2(20,sizeY*32)));
     makeActor(std::make_shared<Wall>(VECTOR2((sizeX-1)*32+10,(sizeY+1)/2*32),VECTOR2(20,sizeY*32)));
-    makeActor(std::make_shared<Wall>(VECTOR2(16+(sizeX-1)/2*32,12+(sizeY-1)/2*32),VECTOR2(32,24)));
+    makeActor(std::make_shared<Wall>(VECTOR2(16+(sizeX-1)/2*32,12+(sizeY-1)/2*32),VECTOR2(32*7,24)));
+    makeActor(std::make_shared<Wall>(VECTOR2(16+(sizeX-1)/2*32,12+(sizeY-1)/2*32),VECTOR2(32,24+4*32)));
+
+    makeActor(std::make_shared<Wall>(VECTOR2(16+1*32,12+(sizeY-1)/2*32),VECTOR2(32*3,24)));
+    makeActor(std::make_shared<Wall>(VECTOR2(16+(sizeX-2)*32,12+(sizeY-1)/2*32),VECTOR2(32*3,24)));
 
     for (int i=0; i<2; i++) {
         gamePlayers.push_back(std::make_shared<Player>(i));
@@ -63,8 +67,8 @@ void Game::update() {
 
     restartTime--;
     if (restartTime == 0) {
-        if (actors.size() > 7) {
-            actors.erase(actors.begin()+7,actors.end());
+        if (actors.size() > 10) {
+            actors.erase(actors.begin()+10,actors.end());
         }
         for (int i=0; i<2; i++) {
             int sizeX = 23;

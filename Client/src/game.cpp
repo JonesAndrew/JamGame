@@ -98,6 +98,47 @@ void Game::setupScene(sf::RenderWindow &window) {
     s2.setPosition(int(windowSize.x/2+32),10);
     mid.setPosition(int(windowSize.x/2),10);
 
+    int sizeX=23;
+    int sizeY=13;
+    for (int x=0;x<sizeX;x++) {
+        tiles.emplace_back();
+        for (int y=0;y<sizeY;y++) {
+            tiles[x].push_back(8);
+        }
+    }
+
+    for (int i=0;i<sizeX;i++) {
+        tiles[i][0] = 4;
+        tiles[i][sizeY-1] = 5;
+    }
+
+    for (int i=0;i<sizeY;i++) {
+        tiles[0][i] = 7;
+        tiles[sizeX-1][i] = 6;
+    }
+
+    tiles[0][0] = 0;
+    tiles[sizeX-1][0] = 1;
+    tiles[0][sizeY-1] = 2;
+    tiles[sizeX-1][sizeY-1] = 3;
+
+    tiles[11][6] = 15;
+    tiles[10][6] = 11;
+    tiles[12][6] = 11;
+    tiles[9][6] = 11;
+    tiles[13][6] = 11;
+    tiles[8][6] = 14;
+    tiles[14][6] = 10;
+
+    tiles[11][5] = 16;
+    tiles[11][7] = 16;
+    tiles[11][4] = 9;
+    tiles[11][8] = 12;
+    tiles[1][6] = 11;
+    tiles[2][6] = 10;
+    tiles[21][6] = 11;
+    tiles[20][6] = 14;
+
     for (int i=0;i<2;i++) {
         lastAngle[i] = 0;
         score[i] = 0;
@@ -156,27 +197,7 @@ void Game::draw(sf::RenderTarget *window,float alpha) {
     int sizeY=13;
     for (int x=0;x<sizeX;x++) {
         for (int y=0;y<sizeY;y++) {
-            if (x==0 && y==0) {
-                tileSheet.setTextureRect(sf::IntRect(0, 0, 32, 32));
-            } else if (x==sizeX-1 && y==0) {
-                tileSheet.setTextureRect(sf::IntRect(32, 0, 32, 32));
-            } else if (x==0 && y==sizeY-1) {
-                tileSheet.setTextureRect(sf::IntRect(64, 0, 32, 32));
-            } else if (x==sizeX-1 && y==sizeY-1) {
-                tileSheet.setTextureRect(sf::IntRect(96, 0, 32, 32));
-            } else if (x==0) {
-                tileSheet.setTextureRect(sf::IntRect(96, 32, 32, 32));
-            } else if (x==sizeX-1) {
-                tileSheet.setTextureRect(sf::IntRect(64, 32, 32, 32));
-            } else if (y==0) {
-                tileSheet.setTextureRect(sf::IntRect(0, 32, 32, 32));
-            } else if (y==sizeY-1) {
-                tileSheet.setTextureRect(sf::IntRect(32, 32, 32, 32));
-            } else if (x==(sizeX-1)/2 && y==(sizeY-1)/2) {
-                tileSheet.setTextureRect(sf::IntRect(32, 96, 32, 32));
-            } else {
-                tileSheet.setTextureRect(sf::IntRect(0, 64, 32, 32));
-            }
+            tileSheet.setTextureRect(sf::IntRect((tiles[x][y]%4)*32, (tiles[x][y]/4)*32, 32, 32));
             tileSheet.setPosition(x*32,y*32);
             window->draw(tileSheet);
         }

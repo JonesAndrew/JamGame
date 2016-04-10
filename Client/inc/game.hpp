@@ -68,6 +68,8 @@ class Game : public Scene {
     std::map<sf::Uint8,std::string> sfxToName;
     std::map<sf::Uint8,int> sfxToVol;
 
+    std::vector<std::vector<int> > tiles;
+
     sf::TcpSocket socket;
     sf::UdpSocket *gameSocket;
 

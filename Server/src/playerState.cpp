@@ -79,27 +79,34 @@ PlayerState* WalkState::handleInput(Player& player, Input input) {
 	player.setAngle(input.angle/M_PI*180);
 
 	if (player.shotTime <= 0) {
-		if (input.s && player.bulletCount > 0) {
-			VECTOR2 hand(15,0);
-			hand%=input.angle;
-			float speed = 3.25;
-			if (player.getRandom() != 0) {
-				speed = 5.25;
-				player.sfx.push_back(2);
-				player.game->setShake(10);
-			} else {
-				player.sfx.push_back(1);
-				player.game->setShake(5);
+		if (input.s) {
+			player.charge++;
+			if (player.charge > 100) {
+				player.charge = 100;
 			}
-			player.game->makeActor(std::make_shared<Bullet>(player.getPos()+hand,speed,input.angle,player.color));
-			player.shotTime = 40;
-            player.bulletCount--;
-            player.rotTarget++;
-            player.b[0] = false;
-            player.shift();
-            if (player.rotTarget == 6) {
-            	player.rotTarget = 0;
-            }
+		} else {
+			if (player.charge > 0 && player.bulletCount > 0) {
+				VECTOR2 hand(15,0);
+				hand%=input.angle;
+				float speed = 3.00+(player.charge*2.5)/100.0;
+				if (speed < 5.4) {
+					player.sfx.push_back(1);
+					player.game->setShake(5);
+				} else {
+					player.sfx.push_back(2);
+					player.game->setShake(10);
+				}
+				player.game->makeActor(std::make_shared<Bullet>(player.getPos()+hand,speed,input.angle,player.color));
+				player.shotTime = 40;
+	            player.bulletCount--;
+	            player.rotTarget++;
+	            player.b[0] = false;
+	            player.shift();
+	            if (player.rotTarget == 6) {
+	            	player.rotTarget = 0;
+	            }
+			}
+			player.charge = 0;
 		}
 	}
 
@@ -107,7 +114,7 @@ PlayerState* WalkState::handleInput(Player& player, Input input) {
 		if (i.x == 0 && i.y == 0) {
 			return new ShieldState();
 		} else if (player.dodgeTime <= 0) {
-			player.dodgeTime = 40;
+			player.dodgeTime = 52;
 			player.setVelocity(VECTOR2(player.getMaxVel()*1.5,0)%std::atan2(i.y,i.x));
 			return new RollState();
 		}
@@ -119,6 +126,16 @@ PlayerState* WalkState::handleInput(Player& player, Input input) {
 void RollState::enter(Player& player) {
 	player.frame=8;
 	player.frameTime = 0;
+}
+
+PlayerState* RollState::handleInput(Player& player, Input input) {
+	if (input.s) {
+		player.charge++;
+		if (player.charge > 100) {
+			player.charge = 100;
+		}
+	}
+	return nullptr;
 }
 
 PlayerState* RollState::update(Player& player) {

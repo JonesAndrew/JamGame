@@ -18,7 +18,7 @@ public:
     Polygon *nPol;
     Polygon *sPol;
 
-    int shotTime,shield,bulletCount,dodgeTime;
+    int shotTime,shield,bulletCount,dodgeTime,charge;
     sf::Uint8 rotTarget;
     sf::Uint8 color;
     sf::Uint8 bu;
