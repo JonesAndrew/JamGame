@@ -19,5 +19,6 @@ public:
     int step;
     std::shared_ptr<Bullet> last;
     int countdown;
+    int bounce;
     float speed;
 };

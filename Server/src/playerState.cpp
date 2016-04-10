@@ -80,23 +80,12 @@ PlayerState* WalkState::handleInput(Player& player, Input input) {
 
 	if (player.shotTime <= 0) {
 		if (input.s) {
-			player.charge++;
-			if (player.charge > 100) {
-				player.charge = 100;
-			}
-		} else {
-			if (player.charge > 0 && player.bulletCount > 0) {
+			if (player.bulletCount > 0) {
 				VECTOR2 hand(15,0);
 				hand%=input.angle;
-				float speed = 3.00+(player.charge*2.5)/100.0;
-				if (speed < 5.4) {
-					player.sfx.push_back(1);
-					player.game->setShake(5);
-				} else {
-					player.sfx.push_back(2);
-					player.game->setShake(10);
-				}
-				player.game->makeActor(std::make_shared<Bullet>(player.getPos()+hand,speed,input.angle,player.color));
+				player.sfx.push_back(1);
+				player.game->setShake(5);
+				player.game->makeActor(std::make_shared<Bullet>(player.getPos()+hand,5.25,input.angle,player.color));
 				player.shotTime = 40;
 	            player.bulletCount--;
 	            player.rotTarget++;
@@ -106,7 +95,6 @@ PlayerState* WalkState::handleInput(Player& player, Input input) {
 	            	player.rotTarget = 0;
 	            }
 			}
-			player.charge = 0;
 		}
 	}
 
@@ -129,12 +117,6 @@ void RollState::enter(Player& player) {
 }
 
 PlayerState* RollState::handleInput(Player& player, Input input) {
-	if (input.s) {
-		player.charge++;
-		if (player.charge > 100) {
-			player.charge = 100;
-		}
-	}
 	return nullptr;
 }
 

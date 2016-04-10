@@ -28,6 +28,8 @@ void Wall::collideWith(std::shared_ptr<Bullet> b) {
 	VECTOR2 dif = b->getPos()-pos;
 	VECTOR2 newpos;
 
+	b->bounce--;
+
 	int r = rand()%1000;
 	float off = (r-500)/10000.0;
 
@@ -39,6 +41,9 @@ void Wall::collideWith(std::shared_ptr<Bullet> b) {
 		newpos = VECTOR2(pos.x+copysign((size.x/2)+b->getRadius(),dif.x),
 			b->getPos().y);
 		b->setVelocity(VECTOR2(-b->getVelocity().x,b->getVelocity().y)%off);
+	}
+	if (b->bounce < 0) {
+		b->live = false;
 	}
 
 	b->sfx.push_back(0);

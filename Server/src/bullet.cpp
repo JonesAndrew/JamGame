@@ -28,6 +28,7 @@ Bullet::Bullet(VECTOR2 p, float s, float a, sf::Uint8 c) : Actor() {
     live = true;
     step = 0;
     countdown = 0;
+    bounce = 2;
     if (speed >= 5.4) {
         countdown = 300;
     }
